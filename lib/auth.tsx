@@ -1,7 +1,15 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { User, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signInWithCustomToken, signOut, deleteUser } from "firebase/auth";
+import {
+  User,
+  onAuthStateChanged,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signInWithCustomToken,
+  signOut,
+  deleteUser,
+} from "firebase/auth";
 import { auth } from "./firebase";
 import { useRouter } from "next/navigation";
 
@@ -67,16 +75,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const clientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
       if (!clientId) {
-        alert("네이버 로그인 설정이 필요합니다. NEXT_PUBLIC_NAVER_CLIENT_ID를 확인해주세요.");
+        alert(
+          "네이버 로그인 설정이 필요합니다. NEXT_PUBLIC_NAVER_CLIENT_ID를 확인해주세요."
+        );
         return;
       }
 
       const redirectUri = `${window.location.origin}/auth/naver/callback`;
       const state = Math.random().toString(36).substring(2, 15);
-      sessionStorage.setItem('naver_oauth_state', state);
-      
-      const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&prompt=login`;
-      
+      sessionStorage.setItem("naver_oauth_state", state);
+
+      const naverAuthUrl = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(
+        redirectUri
+      )}&state=${state}&prompt=login`;
+
       window.location.href = naverAuthUrl;
     } catch (error) {
       console.error("네이버 로그인 실패:", error);
@@ -93,14 +105,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const clientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
       if (!clientId) {
-        alert("카카오 로그인 설정이 필요합니다. NEXT_PUBLIC_KAKAO_CLIENT_ID를 확인해주세요.");
+        alert(
+          "카카오 로그인 설정이 필요합니다. NEXT_PUBLIC_KAKAO_CLIENT_ID를 확인해주세요."
+        );
         return;
       }
 
       const redirectUri = `${window.location.origin}/auth/kakao/callback`;
-      
-      const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&prompt=login`;
-      
+
+      const kakaoAuthUrl = `https://kauth.kakao.com/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
+        redirectUri
+      )}&response_type=code&prompt=login&scope=profile_nickname,account_email,profile_image`;
+
       window.location.href = kakaoAuthUrl;
     } catch (error) {
       console.error("카카오 로그인 실패:", error);
@@ -124,10 +140,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Firestore 데이터 삭제
       const firestoreModule = await import("./firestore");
       await firestoreModule.deleteUserData(auth.currentUser.uid);
-      
+
       // Firebase Auth 계정 삭제
       await deleteUser(auth.currentUser);
-      
+
       router.push("/");
     } catch (error) {
       console.error("계정 삭제 실패:", error);
@@ -136,15 +152,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      loading, 
-      signInWithGoogle, 
-      signInWithNaver,
-      signInWithKakao,
-      logout, 
-      deleteAccount 
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        signInWithGoogle,
+        signInWithNaver,
+        signInWithKakao,
+        logout,
+        deleteAccount,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -157,4 +175,3 @@ export function useAuth() {
   }
   return context;
 }
-
