@@ -30,10 +30,10 @@ export default function PrintView({
   // 이미지 프리로드
   useEffect(() => {
     const images = [
-      '/classroom-background.png',
-      '/desk-wood.png',
-      '/desk-wood-boy.png',
-      '/desk-wood-girl.png',
+      "/classroom-background.png",
+      "/desk-wood.png",
+      "/desk-wood-boy.png",
+      "/desk-wood-girl.png",
     ];
 
     images.forEach((src) => {
@@ -88,7 +88,7 @@ export default function PrintView({
 
       <div
         className={cn(
-          "flex flex-col items-center w-full max-w-6xl mx-auto print:w-full print:max-w-none rounded-2xl shadow-lg border border-gray-100 relative overflow-hidden px-8 py-24",
+          "flex flex-col items-center w-full max-w-6xl mx-auto print:w-full print:max-w-none rounded-2xl shadow-lg border border-gray-100 relative overflow-hidden px-8 py-24 print:border-0 print:shadow-none",
           viewMode === "teacher" && "transform rotate-180"
         )}
         style={{
@@ -101,22 +101,10 @@ export default function PrintView({
         }}
       >
         <div className="relative z-10 w-full">
-          {/* 칠판/교탁 */}
-          <div
-            className="flex justify-center mb-6"
-            style={
-              viewMode === "teacher" ? { transform: "rotate(180deg)" } : {}
-            }
-          >
-            <div className="bg-slate-700 text-white px-28 py-4 rounded-lg text-lg font-semibold shadow-xl">
-              칠판
-            </div>
-          </div>
-
           {/* 그리드 */}
           {layoutType === "분단형" ? (
             // 분단형 레이아웃: 2열씩 그룹화, 그룹 간 큰 간격
-            <div className="flex gap-12 justify-center mx-auto">
+            <div className="flex gap-12 justify-center mx-auto" style={{ marginTop: "60px" }}>
               {Array.from({ length: Math.floor(cols / 2) }).map(
                 (_, groupIndex) => {
                   const startCol = groupIndex * 2;
@@ -209,7 +197,7 @@ export default function PrintView({
             </div>
           ) : layoutType === "모둠형(4인)" ? (
             // 모둠형 레이아웃: 2열씩 그룹화, 특정 행 사이에 복도
-            <div className="flex gap-12 justify-center mx-auto">
+            <div className="flex gap-12 justify-center mx-auto" style={{ marginTop: "60px" }}>
               {Array.from({ length: Math.floor(cols / 2) }).map(
                 (_, groupIndex) => {
                   const startCol = groupIndex * 2;
@@ -322,6 +310,7 @@ export default function PrintView({
               style={{
                 gridTemplateColumns: `repeat(${cols}, minmax(90px, 1fr))`,
                 width: "fit-content",
+                marginTop: "60px",
               }}
             >
               {Array.from({ length: rows }).map((_, r) =>
