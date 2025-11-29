@@ -35,11 +35,14 @@ export async function getClassRosters(userId: string): Promise<ClassRoster[]> {
   if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const q = query(collection(db, `users/${userId}/classRosters`));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-    createdAt: doc.data().createdAt?.toDate(),
-  })) as ClassRoster[];
+  return snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: data.createdAt?.toDate(),
+    } as ClassRoster;
+  });
 }
 
 export async function getClassRoster(
@@ -87,11 +90,14 @@ export async function getLayouts(userId: string): Promise<Layout[]> {
   if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const q = query(collection(db, `users/${userId}/layouts`));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-    createdAt: doc.data().createdAt?.toDate(),
-  })) as Layout[];
+  return snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: data.createdAt?.toDate(),
+    } as Layout;
+  });
 }
 
 export async function getLayout(
@@ -218,12 +224,15 @@ export async function getNotices(): Promise<Notice[]> {
   if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const q = query(collection(db, "notices"), orderBy("createdAt", "desc"));
   const snapshot = await getDocs(q);
-  const notices = snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-    createdAt: doc.data().createdAt?.toDate(),
-    updatedAt: doc.data().updatedAt?.toDate(),
-  })) as Notice[];
+  const notices = snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: data.createdAt?.toDate(),
+      updatedAt: data.updatedAt?.toDate(),
+    } as Notice;
+  });
   
   // 고정글을 상단으로 정렬 (클라이언트 사이드)
   return notices.sort((a, b) => {
@@ -313,13 +322,16 @@ export async function getFeedbacks(options?: GetFeedbacksOptions): Promise<Feedb
   }
   
   const snapshot = await getDocs(q);
-  let feedbacks = snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-    createdAt: doc.data().createdAt?.toDate(),
-    updatedAt: doc.data().updatedAt?.toDate(),
-    repliedAt: doc.data().repliedAt?.toDate(),
-  })) as Feedback[];
+  let feedbacks = snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: data.createdAt?.toDate(),
+      updatedAt: data.updatedAt?.toDate(),
+      repliedAt: data.repliedAt?.toDate(),
+    } as Feedback;
+  });
   
   // 클라이언트 사이드 검색 (Firestore 쿼리 제한으로 인해)
   if (options?.searchQuery) {
@@ -439,12 +451,15 @@ export async function getComments(postId: string, postType: PostType): Promise<C
       orderBy("createdAt", "asc")
     );
     const snapshot = await getDocs(q);
-    const comments = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate(),
-      updatedAt: doc.data().updatedAt?.toDate(),
-    })) as Comment[];
+    const comments = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate(),
+        updatedAt: data.updatedAt?.toDate(),
+      } as Comment;
+    });
     return comments;
   } catch (error: any) {
     // 인덱스 오류인 경우, orderBy 없이 조회 후 클라이언트에서 정렬
@@ -456,12 +471,15 @@ export async function getComments(postId: string, postType: PostType): Promise<C
         where("postType", "==", postType)
       );
       const snapshot = await getDocs(q);
-      const comments = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        createdAt: doc.data().createdAt?.toDate(),
-        updatedAt: doc.data().updatedAt?.toDate(),
-      })) as Comment[];
+      const comments = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          createdAt: data.createdAt?.toDate(),
+          updatedAt: data.updatedAt?.toDate(),
+        } as Comment;
+      });
       // 클라이언트에서 날짜순 정렬
       return comments.sort((a, b) => {
         const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
