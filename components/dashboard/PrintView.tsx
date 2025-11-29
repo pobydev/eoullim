@@ -88,7 +88,9 @@ export default function PrintView({
           {/* 칠판/교탁 */}
           <div
             className="flex justify-center mb-6"
-            style={viewMode === "teacher" ? { transform: "rotate(180deg)" } : {}}
+            style={
+              viewMode === "teacher" ? { transform: "rotate(180deg)" } : {}
+            }
           >
             <div className="bg-slate-700 text-white px-28 py-4 rounded-lg text-lg font-semibold shadow-xl">
               칠판
@@ -96,86 +98,90 @@ export default function PrintView({
           </div>
 
           {/* 그리드 */}
-        {layoutType === "분단형" ? (
-          // 분단형 레이아웃: 2열씩 그룹화, 그룹 간 큰 간격
-          <div className="flex gap-12 justify-center mx-auto">
-            {Array.from({ length: Math.floor(cols / 2) }).map(
-              (_, groupIndex) => {
-                const startCol = groupIndex * 2;
+          {layoutType === "분단형" ? (
+            // 분단형 레이아웃: 2열씩 그룹화, 그룹 간 큰 간격
+            <div className="flex gap-12 justify-center mx-auto">
+              {Array.from({ length: Math.floor(cols / 2) }).map(
+                (_, groupIndex) => {
+                  const startCol = groupIndex * 2;
 
-                return (
-                  <div
-                    key={groupIndex}
-                    className="grid gap-0"
-                    style={{
-                      gridTemplateColumns: `repeat(2, minmax(0, 1fr))`,
-                      width: `${2 * 120}px`, // 각 분단의 너비 고정
-                    }}
-                  >
-                    {Array.from({ length: rows }).map((_, r) =>
-                      Array.from({ length: 2 }).map((_, localC) => {
-                        const c = startCol + localC;
-                        const cell = getCell(r, c);
-                        const assignment = getAssignment(r, c);
-                        const student = getStudent(
-                          assignment?.studentId || null
-                        );
+                  return (
+                    <div
+                      key={groupIndex}
+                      className="grid gap-0"
+                      style={{
+                        gridTemplateColumns: `repeat(2, minmax(0, 1fr))`,
+                        width: `${2 * 120}px`, // 각 분단의 너비 고정
+                      }}
+                    >
+                      {Array.from({ length: rows }).map((_, r) =>
+                        Array.from({ length: 2 }).map((_, localC) => {
+                          const c = startCol + localC;
+                          const cell = getCell(r, c);
+                          const assignment = getAssignment(r, c);
+                          const student = getStudent(
+                            assignment?.studentId || null
+                          );
 
-                        if (!cell) return null;
+                          if (!cell) return null;
 
-                        return (
-                          <div
-                            key={`${r}-${c}`}
-                            className={cn(
-                              "w-full min-w-[120px] h-24 flex items-center justify-center border-transparent rounded-lg relative",
-                              !cell.isActive &&
-                                "opacity-0",
-                              cell.isActive &&
-                                "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
-                              cell.isActive &&
-                                !assignment?.studentId &&
-                                "[&::before]:bg-[url('/desk-wood.png')]",
-                              cell.isActive &&
-                                assignment?.studentId &&
-                                student &&
-                                student.gender === "M" &&
-                                "[&::before]:bg-[url('/desk-wood-boy.png')] [&::before]:brightness-125",
-                              cell.isActive &&
-                                assignment?.studentId &&
-                                student &&
-                                student.gender === "F" &&
-                                "[&::before]:bg-[url('/desk-wood-girl.png')] [&::before]:brightness-110",
-                              cell.isActive &&
-                                assignment?.studentId &&
-                                student &&
-                                !student.gender &&
-                                "[&::before]:bg-[url('/desk-wood.png')]",
-                              getZoneColorClass(cell.zoneId)
-                            )}
-                            style={
-                              viewMode === "teacher"
-                                ? { transform: "rotate(180deg)" }
-                                : {}
-                            }
-                          >
-                            {cell.isActive && (
-                              <div className="text-center px-2 w-full relative z-10">
-                                {assignment?.studentId && student ? (
-                                  <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
-                                    {student.attendanceNumber && (
-                                      <span className="text-base font-normal text-gray-500 mr-1">
-                                        {student.attendanceNumber}.
-                                      </span>
-                                    )}
-                                    {student.name}
-                                  </div>
-                                ) : (
-                                  <div className="text-xs text-gray-400 print:hidden">
-                                    {r + 1}-{c + 1}
-                                  </div>
-                                )}
-                              </div>
-                            )}
+                          return (
+                            <div
+                              key={`${r}-${c}`}
+                              className={cn(
+                                "w-full min-w-[120px] h-24 flex items-center justify-center border-transparent rounded-lg relative",
+                                !cell.isActive && "opacity-0",
+                                cell.isActive &&
+                                  "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
+                                cell.isActive &&
+                                  !assignment?.studentId &&
+                                  "[&::before]:bg-[url('/desk-wood.png')]",
+                                cell.isActive &&
+                                  assignment?.studentId &&
+                                  student &&
+                                  student.gender === "M" &&
+                                  "[&::before]:bg-[url('/desk-wood-boy.png')] [&::before]:brightness-125",
+                                cell.isActive &&
+                                  assignment?.studentId &&
+                                  student &&
+                                  student.gender === "F" &&
+                                  "[&::before]:bg-[url('/desk-wood-girl.png')] [&::before]:brightness-110",
+                                cell.isActive &&
+                                  assignment?.studentId &&
+                                  student &&
+                                  !student.gender &&
+                                  "[&::before]:bg-[url('/desk-wood.png')]",
+                                getZoneColorClass(cell.zoneId)
+                              )}
+                              style={
+                                viewMode === "teacher"
+                                  ? { transform: "rotate(180deg)" }
+                                  : {}
+                              }
+                            >
+                              {cell.isActive && (
+                                <div
+                                  className="text-center px-2 w-full relative z-[2]"
+                                  style={{ transform: "translateY(-12px)" }}
+                                >
+                                  {assignment?.studentId && student ? (
+                                    <div className="flex flex-col h-full relative">
+                                      <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
+                                        {student.attendanceNumber && (
+                                          <span className="text-base font-normal text-gray-500 mr-1">
+                                            {student.attendanceNumber}.
+                                          </span>
+                                        )}
+                                        {student.name}
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="text-xs text-gray-400 print:hidden">
+                                      {r + 1}-{c + 1}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                           </div>
                         );
                       })
@@ -186,71 +192,70 @@ export default function PrintView({
             )}
           </div>
         ) : layoutType === "모둠형(4인)" ? (
-          // 모둠형 레이아웃: 2열씩 그룹화, 특정 행 사이에 복도
-          <div className="flex gap-12 justify-center mx-auto">
-            {Array.from({ length: Math.floor(cols / 2) }).map(
-              (_, groupIndex) => {
-                const startCol = groupIndex * 2;
+            // 모둠형 레이아웃: 2열씩 그룹화, 특정 행 사이에 복도
+            <div className="flex gap-12 justify-center mx-auto">
+              {Array.from({ length: Math.floor(cols / 2) }).map(
+                (_, groupIndex) => {
+                  const startCol = groupIndex * 2;
 
-                return (
-                  <div
-                    key={groupIndex}
-                    className="flex flex-col"
-                    style={{
-                      width: `${2 * 120}px`,
-                    }}
-                  >
-                    {Array.from({ length: rows }).map((_, r) => {
-                      // 복도가 필요한 행: 2-3 사이, 4-5 사이 (0-based이므로 2, 4)
-                      const needsAisle = r === 2 || r === 4;
-                      const aisleHeight = "h-8"; // 복도 높이
+                  return (
+                    <div
+                      key={groupIndex}
+                      className="flex flex-col"
+                      style={{
+                        width: `${2 * 120}px`,
+                      }}
+                    >
+                      {Array.from({ length: rows }).map((_, r) => {
+                        // 복도가 필요한 행: 2-3 사이, 4-5 사이 (0-based이므로 2, 4)
+                        const needsAisle = r === 2 || r === 4;
+                        const aisleHeight = "h-8"; // 복도 높이
 
-                      return (
-                        <div key={r}>
-                          {/* 복도 */}
-                          {needsAisle && <div className={aisleHeight} />}
+                        return (
+                          <div key={r}>
+                            {/* 복도 */}
+                            {needsAisle && <div className={aisleHeight} />}
 
-                          {/* 행의 책상들 */}
-                          <div className="grid grid-cols-2 gap-0 gap-y-2">
-                            {Array.from({ length: 2 }).map((_, localC) => {
-                              const c = startCol + localC;
-                              const cell = getCell(r, c);
-                              const assignment = getAssignment(r, c);
-                              const student = getStudent(
-                                assignment?.studentId || null
-                              );
+                            {/* 행의 책상들 */}
+                            <div className="grid grid-cols-2 gap-0 gap-y-2">
+                              {Array.from({ length: 2 }).map((_, localC) => {
+                                const c = startCol + localC;
+                                const cell = getCell(r, c);
+                                const assignment = getAssignment(r, c);
+                                const student = getStudent(
+                                  assignment?.studentId || null
+                                );
 
-                              if (!cell) return null;
+                                if (!cell) return null;
 
-                              return (
-                                <div
-                                  key={`${r}-${c}`}
-                                  className={cn(
-                                    "w-full min-w-[120px] h-24 flex items-center justify-center border-transparent rounded-lg relative",
-                                    !cell.isActive &&
-                                      "opacity-0",
-                                    cell.isActive &&
-                                      "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
-                                    cell.isActive &&
-                                      !assignment?.studentId &&
-                                      "[&::before]:bg-[url('/desk-wood.png')]",
-                                    cell.isActive &&
-                                      assignment?.studentId &&
-                                      student &&
-                                      student.gender === "M" &&
-                                      "[&::before]:bg-[url('/desk-wood-boy.png')] [&::before]:brightness-125",
-                                    cell.isActive &&
-                                      assignment?.studentId &&
-                                      student &&
-                                      student.gender === "F" &&
-                                      "[&::before]:bg-[url('/desk-wood-girl.png')] [&::before]:brightness-110",
-                                    cell.isActive &&
-                                      assignment?.studentId &&
-                                      student &&
-                                      !student.gender &&
-                                      "[&::before]:bg-[url('/desk-wood.png')]",
-                                    getZoneColorClass(cell.zoneId)
-                                  )}
+                                return (
+                                  <div
+                                    key={`${r}-${c}`}
+                                    className={cn(
+                                      "w-full min-w-[120px] h-24 flex items-center justify-center border-transparent rounded-lg relative",
+                                      !cell.isActive && "opacity-0",
+                                      cell.isActive &&
+                                        "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
+                                      cell.isActive &&
+                                        !assignment?.studentId &&
+                                        "[&::before]:bg-[url('/desk-wood.png')]",
+                                      cell.isActive &&
+                                        assignment?.studentId &&
+                                        student &&
+                                        student.gender === "M" &&
+                                        "[&::before]:bg-[url('/desk-wood-boy.png')] [&::before]:brightness-125",
+                                      cell.isActive &&
+                                        assignment?.studentId &&
+                                        student &&
+                                        student.gender === "F" &&
+                                        "[&::before]:bg-[url('/desk-wood-girl.png')] [&::before]:brightness-110",
+                                      cell.isActive &&
+                                        assignment?.studentId &&
+                                        student &&
+                                        !student.gender &&
+                                        "[&::before]:bg-[url('/desk-wood.png')]",
+                                      getZoneColorClass(cell.zoneId)
+                                    )}
                                   style={
                                     viewMode === "teacher"
                                       ? { transform: "rotate(180deg)" }
@@ -258,15 +263,20 @@ export default function PrintView({
                                   }
                                 >
                                   {cell.isActive && (
-                                    <div className="text-center px-2 w-full relative z-10">
+                                    <div
+                                      className="text-center px-2 w-full relative z-[2]"
+                                      style={{ transform: "translateY(-12px)" }}
+                                    >
                                       {assignment?.studentId && student ? (
-                                        <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
-                                          {student.attendanceNumber && (
-                                            <span className="text-base font-normal text-gray-500 mr-1">
-                                              {student.attendanceNumber}.
-                                            </span>
-                                          )}
-                                          {student.name}
+                                        <div className="flex flex-col h-full relative">
+                                          <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
+                                            {student.attendanceNumber && (
+                                              <span className="text-base font-normal text-gray-500 mr-1">
+                                                {student.attendanceNumber}.
+                                              </span>
+                                            )}
+                                            {student.name}
+                                          </div>
                                         </div>
                                       ) : (
                                         <div className="text-xs text-gray-400 print:hidden">
@@ -288,51 +298,50 @@ export default function PrintView({
             )}
           </div>
         ) : (
-          // 기본형 레이아웃: 모든 열이 동일한 간격
-          <div
-            className="grid gap-y-1 gap-x-12 mx-auto print:w-full print:max-w-full print:gap-y-1 print:gap-x-12"
-            style={{
-              gridTemplateColumns: `repeat(${cols}, minmax(90px, 1fr))`,
-              width: "fit-content",
-            }}
-          >
-            {Array.from({ length: rows }).map((_, r) =>
-              Array.from({ length: cols }).map((_, c) => {
-                const cell = getCell(r, c);
-                const assignment = getAssignment(r, c);
-                const student = getStudent(assignment?.studentId || null);
+            // 기본형 레이아웃: 모든 열이 동일한 간격
+            <div
+              className="grid gap-y-1 gap-x-12 mx-auto print:w-full print:max-w-full print:gap-y-1 print:gap-x-12"
+              style={{
+                gridTemplateColumns: `repeat(${cols}, minmax(90px, 1fr))`,
+                width: "fit-content",
+              }}
+            >
+              {Array.from({ length: rows }).map((_, r) =>
+                Array.from({ length: cols }).map((_, c) => {
+                  const cell = getCell(r, c);
+                  const assignment = getAssignment(r, c);
+                  const student = getStudent(assignment?.studentId || null);
 
-                if (!cell) return null;
+                  if (!cell) return null;
 
-                return (
-                  <div
-                    key={`${r}-${c}`}
-                    className={cn(
-                      "w-[120px] print:w-full print:min-w-[90px] h-24 print:h-[64px] flex items-center justify-center border-transparent rounded-lg relative",
-                      !cell.isActive &&
-                        "opacity-0",
-                      cell.isActive &&
-                        "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
-                      cell.isActive &&
-                        !assignment?.studentId &&
-                        "[&::before]:bg-[url('/desk-wood.png')]",
-                      cell.isActive &&
-                        assignment?.studentId &&
-                        student &&
-                        student.gender === "M" &&
-                        "[&::before]:bg-[url('/desk-wood-boy.png')] [&::before]:brightness-125",
-                      cell.isActive &&
-                        assignment?.studentId &&
-                        student &&
-                        student.gender === "F" &&
-                        "[&::before]:bg-[url('/desk-wood-girl.png')] [&::before]:brightness-110",
-                      cell.isActive &&
-                        assignment?.studentId &&
-                        student &&
-                        !student.gender &&
-                        "[&::before]:bg-[url('/desk-wood.png')]",
-                      getZoneColorClass(cell.zoneId)
-                    )}
+                  return (
+                    <div
+                      key={`${r}-${c}`}
+                      className={cn(
+                        "w-[120px] print:w-full print:min-w-[90px] h-24 print:h-[64px] flex items-center justify-center border-transparent rounded-lg relative",
+                        !cell.isActive && "opacity-0",
+                        cell.isActive &&
+                          "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
+                        cell.isActive &&
+                          !assignment?.studentId &&
+                          "[&::before]:bg-[url('/desk-wood.png')]",
+                        cell.isActive &&
+                          assignment?.studentId &&
+                          student &&
+                          student.gender === "M" &&
+                          "[&::before]:bg-[url('/desk-wood-boy.png')] [&::before]:brightness-125",
+                        cell.isActive &&
+                          assignment?.studentId &&
+                          student &&
+                          student.gender === "F" &&
+                          "[&::before]:bg-[url('/desk-wood-girl.png')] [&::before]:brightness-110",
+                        cell.isActive &&
+                          assignment?.studentId &&
+                          student &&
+                          !student.gender &&
+                          "[&::before]:bg-[url('/desk-wood.png')]",
+                        getZoneColorClass(cell.zoneId)
+                      )}
                     style={
                       viewMode === "teacher"
                         ? { transform: "rotate(180deg)" }
@@ -340,15 +349,20 @@ export default function PrintView({
                     }
                   >
                     {cell.isActive && (
-                      <div className="text-center px-2 w-full relative z-10">
+                      <div
+                        className="text-center px-2 w-full relative z-[2]"
+                        style={{ transform: "translateY(-15px)" }}
+                      >
                         {assignment?.studentId && student ? (
-                          <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
-                            {student.attendanceNumber && (
-                              <span className="text-base font-normal text-gray-500 mr-1">
-                                {student.attendanceNumber}.
-                              </span>
-                            )}
-                            {student.name}
+                          <div className="flex flex-col h-full relative">
+                            <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
+                              {student.attendanceNumber && (
+                                <span className="text-base font-normal text-gray-500 mr-1">
+                                  {student.attendanceNumber}.
+                                </span>
+                              )}
+                              {student.name}
+                            </div>
                           </div>
                         ) : (
                           <div className="text-xs text-gray-400 print:hidden">
