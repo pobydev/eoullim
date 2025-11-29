@@ -644,10 +644,6 @@ export default function ClassroomGrid({
                         cell.isActive &&
                           assignment?.studentId &&
                           student &&
-                          student.gender === "M" &&
-                          cell.isActive &&
-                          assignment?.studentId &&
-                          student &&
                           student.gender === "F" &&
                           "hover:bg-white/20 hover:border-gray-300",
                         cell.isActive &&
