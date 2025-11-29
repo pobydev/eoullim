@@ -13,7 +13,7 @@ interface FullscreenViewProps {
   assignments: SeatAssignment[];
   selectedRoster: ClassRoster | null;
   zones: Zone[];
-  layoutType: "기본형" | "분단형";
+  layoutType: "기본형" | "분단형" | "모둠형(4인)";
   onClose: () => void;
 }
 
