@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { ClassRoster, Cell, SeatAssignment, Zone } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
@@ -26,6 +27,21 @@ export default function PrintView({
   layoutType = "기본형",
   viewMode,
 }: PrintViewProps) {
+  // 이미지 프리로드
+  useEffect(() => {
+    const images = [
+      '/classroom-background.png',
+      '/desk-wood.png',
+      '/desk-wood-boy.png',
+      '/desk-wood-girl.png',
+    ];
+
+    images.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
   const getCell = (r: number, c: number) => {
     return cells.find((cell) => cell.r === r && cell.c === c);
   };
@@ -182,16 +198,16 @@ export default function PrintView({
                                   )}
                                 </div>
                               )}
-                          </div>
-                        );
-                      })
-                    )}
-                  </div>
-                );
-              }
-            )}
-          </div>
-        ) : layoutType === "모둠형(4인)" ? (
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  );
+                }
+              )}
+            </div>
+          ) : layoutType === "모둠형(4인)" ? (
             // 모둠형 레이아웃: 2열씩 그룹화, 특정 행 사이에 복도
             <div className="flex gap-12 justify-center mx-auto">
               {Array.from({ length: Math.floor(cols / 2) }).map(
@@ -256,48 +272,50 @@ export default function PrintView({
                                         "[&::before]:bg-[url('/desk-wood.png')]",
                                       getZoneColorClass(cell.zoneId)
                                     )}
-                                  style={
-                                    viewMode === "teacher"
-                                      ? { transform: "rotate(180deg)" }
-                                      : {}
-                                  }
-                                >
-                                  {cell.isActive && (
-                                    <div
-                                      className="text-center px-2 w-full relative z-[2]"
-                                      style={{ transform: "translateY(-12px)" }}
-                                    >
-                                      {assignment?.studentId && student ? (
-                                        <div className="flex flex-col h-full relative">
-                                          <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
-                                            {student.attendanceNumber && (
-                                              <span className="text-base font-normal text-gray-500 mr-1">
-                                                {student.attendanceNumber}.
-                                              </span>
-                                            )}
-                                            {student.name}
+                                    style={
+                                      viewMode === "teacher"
+                                        ? { transform: "rotate(180deg)" }
+                                        : {}
+                                    }
+                                  >
+                                    {cell.isActive && (
+                                      <div
+                                        className="text-center px-2 w-full relative z-[2]"
+                                        style={{
+                                          transform: "translateY(-12px)",
+                                        }}
+                                      >
+                                        {assignment?.studentId && student ? (
+                                          <div className="flex flex-col h-full relative">
+                                            <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
+                                              {student.attendanceNumber && (
+                                                <span className="text-base font-normal text-gray-500 mr-1">
+                                                  {student.attendanceNumber}.
+                                                </span>
+                                              )}
+                                              {student.name}
+                                            </div>
                                           </div>
-                                        </div>
-                                      ) : (
-                                        <div className="text-xs text-gray-400 print:hidden">
-                                          {r + 1}-{c + 1}
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
+                                        ) : (
+                                          <div className="text-xs text-gray-400 print:hidden">
+                                            {r + 1}-{c + 1}
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                );
-              }
-            )}
-          </div>
-        ) : (
+                        );
+                      })}
+                    </div>
+                  );
+                }
+              )}
+            </div>
+          ) : (
             // 기본형 레이아웃: 모든 열이 동일한 간격
             <div
               className="grid gap-y-1 gap-x-12 mx-auto print:w-full print:max-w-full print:gap-y-1 print:gap-x-12"
@@ -342,41 +360,41 @@ export default function PrintView({
                           "[&::before]:bg-[url('/desk-wood.png')]",
                         getZoneColorClass(cell.zoneId)
                       )}
-                    style={
-                      viewMode === "teacher"
-                        ? { transform: "rotate(180deg)" }
-                        : {}
-                    }
-                  >
-                    {cell.isActive && (
-                      <div
-                        className="text-center px-2 w-full relative z-[2]"
-                        style={{ transform: "translateY(-15px)" }}
-                      >
-                        {assignment?.studentId && student ? (
-                          <div className="flex flex-col h-full relative">
-                            <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
-                              {student.attendanceNumber && (
-                                <span className="text-base font-normal text-gray-500 mr-1">
-                                  {student.attendanceNumber}.
-                                </span>
-                              )}
-                              {student.name}
+                      style={
+                        viewMode === "teacher"
+                          ? { transform: "rotate(180deg)" }
+                          : {}
+                      }
+                    >
+                      {cell.isActive && (
+                        <div
+                          className="text-center px-2 w-full relative z-[2]"
+                          style={{ transform: "translateY(-15px)" }}
+                        >
+                          {assignment?.studentId && student ? (
+                            <div className="flex flex-col h-full relative">
+                              <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
+                                {student.attendanceNumber && (
+                                  <span className="text-base font-normal text-gray-500 mr-1">
+                                    {student.attendanceNumber}.
+                                  </span>
+                                )}
+                                {student.name}
+                              </div>
                             </div>
-                          </div>
-                        ) : (
-                          <div className="text-xs text-gray-400 print:hidden">
-                            {r + 1}-{c + 1}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })
-            )}
-          </div>
-        )}
+                          ) : (
+                            <div className="text-xs text-gray-400 print:hidden">
+                              {r + 1}-{c + 1}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

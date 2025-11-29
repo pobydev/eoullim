@@ -9,6 +9,34 @@ export default function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
+  // 이미지 프리로드 (link 태그로)
+  useEffect(() => {
+    const images = [
+      '/classroom-background.png',
+      '/desk-wood.png',
+      '/desk-wood-boy.png',
+      '/desk-wood-girl.png',
+    ];
+
+    images.forEach((href) => {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.href = href;
+      link.as = 'image';
+      document.head.appendChild(link);
+    });
+
+    // 컴포넌트 언마운트 시 정리 (선택사항)
+    return () => {
+      images.forEach((href) => {
+        const link = document.querySelector(`link[href="${href}"]`);
+        if (link) {
+          document.head.removeChild(link);
+        }
+      });
+    };
+  }, []);
+
   useEffect(() => {
     if (!loading && !user) {
       router.push("/");
