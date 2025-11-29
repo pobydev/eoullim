@@ -23,6 +23,7 @@ if (typeof window !== "undefined" && !db) {
 }
 
 export async function saveClassRoster(userId: string, roster: ClassRoster) {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const rosterRef = doc(db, `users/${userId}/classRosters`, roster.id);
   await setDoc(rosterRef, {
     ...roster,
@@ -31,6 +32,7 @@ export async function saveClassRoster(userId: string, roster: ClassRoster) {
 }
 
 export async function getClassRosters(userId: string): Promise<ClassRoster[]> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const q = query(collection(db, `users/${userId}/classRosters`));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((doc) => ({
@@ -44,6 +46,7 @@ export async function getClassRoster(
   userId: string,
   classId: string
 ): Promise<ClassRoster | null> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const rosterRef = doc(db, `users/${userId}/classRosters`, classId);
   const snapshot = await getDoc(rosterRef);
   if (!snapshot.exists()) return null;
@@ -55,11 +58,13 @@ export async function getClassRoster(
 }
 
 export async function deleteClassRoster(userId: string, classId: string) {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const rosterRef = doc(db, `users/${userId}/classRosters`, classId);
   await deleteDoc(rosterRef);
 }
 
 export async function saveLayout(userId: string, layout: Layout) {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const layoutRef = doc(db, `users/${userId}/layouts`, layout.id);
   
   // undefined 값을 가진 필드를 제거하여 Firestore 저장 오류 방지
@@ -79,6 +84,7 @@ export async function saveLayout(userId: string, layout: Layout) {
 }
 
 export async function getLayouts(userId: string): Promise<Layout[]> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const q = query(collection(db, `users/${userId}/layouts`));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((doc) => ({
@@ -92,6 +98,7 @@ export async function getLayout(
   userId: string,
   layoutId: string
 ): Promise<Layout | null> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const layoutRef = doc(db, `users/${userId}/layouts`, layoutId);
   const snapshot = await getDoc(layoutRef);
   if (!snapshot.exists()) return null;
@@ -103,12 +110,14 @@ export async function getLayout(
 }
 
 export async function deleteLayout(userId: string, layoutId: string) {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const layoutRef = doc(db, `users/${userId}/layouts`, layoutId);
   await deleteDoc(layoutRef);
 }
 
 // 사용자 프로필 관련 함수
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const userRef = doc(db, `users`, userId);
   const snapshot = await getDoc(userRef);
   if (!snapshot.exists()) return null;
@@ -127,6 +136,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
 }
 
 export async function saveUserProfile(userId: string, profile: UserProfile) {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const userRef = doc(db, `users`, userId);
   const updateData: any = {
     updatedAt: Timestamp.now(),
@@ -165,6 +175,7 @@ export async function saveUserProfile(userId: string, profile: UserProfile) {
 
 // 사용자 계정 삭제 (모든 데이터 삭제)
 export async function deleteUserData(userId: string): Promise<void> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const batch = writeBatch(db);
   
   // 사용자의 모든 명단 삭제
@@ -191,6 +202,7 @@ export async function deleteUserData(userId: string): Promise<void> {
 // ==================== 공지사항 관련 함수 ====================
 
 export async function createNotice(notice: Omit<Notice, "id" | "createdAt" | "updatedAt" | "viewCount">): Promise<string> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const noticeRef = doc(collection(db, "notices"));
   const now = Timestamp.now();
   await setDoc(noticeRef, {
@@ -203,6 +215,7 @@ export async function createNotice(notice: Omit<Notice, "id" | "createdAt" | "up
 }
 
 export async function getNotices(): Promise<Notice[]> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const q = query(collection(db, "notices"), orderBy("createdAt", "desc"));
   const snapshot = await getDocs(q);
   const notices = snapshot.docs.map((doc) => ({
@@ -223,6 +236,7 @@ export async function getNotices(): Promise<Notice[]> {
 }
 
 export async function getNotice(noticeId: string): Promise<Notice | null> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const noticeRef = doc(db, "notices", noticeId);
   const snapshot = await getDoc(noticeRef);
   if (!snapshot.exists()) return null;
@@ -235,6 +249,7 @@ export async function getNotice(noticeId: string): Promise<Notice | null> {
 }
 
 export async function updateNotice(noticeId: string, updates: Partial<Notice>): Promise<void> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const noticeRef = doc(db, "notices", noticeId);
   const updateData: any = {
     ...updates,
@@ -250,11 +265,13 @@ export async function updateNotice(noticeId: string, updates: Partial<Notice>): 
 }
 
 export async function deleteNotice(noticeId: string): Promise<void> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const noticeRef = doc(db, "notices", noticeId);
   await deleteDoc(noticeRef);
 }
 
 export async function incrementNoticeViewCount(noticeId: string): Promise<void> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const noticeRef = doc(db, "notices", noticeId);
   await updateDoc(noticeRef, {
     viewCount: increment(1),
@@ -264,6 +281,7 @@ export async function incrementNoticeViewCount(noticeId: string): Promise<void> 
 // ==================== 피드백 관련 함수 ====================
 
 export async function createFeedback(feedback: Omit<Feedback, "id" | "createdAt" | "updatedAt" | "viewCount" | "status">): Promise<string> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const feedbackRef = doc(collection(db, "feedbacks"));
   const now = Timestamp.now();
   await setDoc(feedbackRef, {
@@ -283,6 +301,7 @@ export interface GetFeedbacksOptions {
 }
 
 export async function getFeedbacks(options?: GetFeedbacksOptions): Promise<Feedback[]> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   let q: any = query(collection(db, "feedbacks"), orderBy("createdAt", "desc"));
   
   if (options?.category) {
@@ -316,6 +335,7 @@ export async function getFeedbacks(options?: GetFeedbacksOptions): Promise<Feedb
 }
 
 export async function getFeedback(feedbackId: string): Promise<Feedback | null> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const feedbackRef = doc(db, "feedbacks", feedbackId);
   const snapshot = await getDoc(feedbackRef);
   if (!snapshot.exists()) return null;
@@ -329,6 +349,7 @@ export async function getFeedback(feedbackId: string): Promise<Feedback | null> 
 }
 
 export async function updateFeedback(feedbackId: string, updates: Partial<Feedback>): Promise<void> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const feedbackRef = doc(db, "feedbacks", feedbackId);
   const updateData: any = {
     ...updates,
@@ -351,11 +372,13 @@ export async function updateFeedback(feedbackId: string, updates: Partial<Feedba
 }
 
 export async function deleteFeedback(feedbackId: string): Promise<void> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const feedbackRef = doc(db, "feedbacks", feedbackId);
   await deleteDoc(feedbackRef);
 }
 
 export async function incrementFeedbackViewCount(feedbackId: string): Promise<void> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const feedbackRef = doc(db, "feedbacks", feedbackId);
   await updateDoc(feedbackRef, {
     viewCount: increment(1),
@@ -406,6 +429,7 @@ export async function createComment(
 }
 
 export async function getComments(postId: string, postType: PostType): Promise<Comment[]> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   try {
     // 복합 쿼리를 사용할 때 인덱스가 필요할 수 있으므로, 먼저 단순 쿼리로 시도
     const q = query(
@@ -450,6 +474,7 @@ export async function getComments(postId: string, postType: PostType): Promise<C
 }
 
 export async function updateComment(commentId: string, updates: Partial<Comment>): Promise<void> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const commentRef = doc(db, "comments", commentId);
   const updateData: any = {
     ...updates,
@@ -465,6 +490,7 @@ export async function updateComment(commentId: string, updates: Partial<Comment>
 }
 
 export async function deleteComment(commentId: string): Promise<void> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   // 삭제 전에 댓글 정보 가져오기
   const commentRef = doc(db, "comments", commentId);
   const commentSnap = await getDoc(commentRef);
