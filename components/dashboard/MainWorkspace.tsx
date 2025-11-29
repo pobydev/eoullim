@@ -264,8 +264,8 @@ export default function MainWorkspace({
 
     const timer = setTimeout(() => {
       const currentAssignment = sequentialAssignments[currentSequentialIndex];
-      onAssignmentsChange((prev) =>
-        prev.map((a) =>
+      onAssignmentsChange(
+        assignments.map((a) =>
           a.seat.r === currentAssignment.seat.r &&
           a.seat.c === currentAssignment.seat.c
             ? currentAssignment
@@ -283,6 +283,7 @@ export default function MainWorkspace({
     sequentialAssignments,
     enableSequentialAnimation,
     onAssignmentsChange,
+    assignments,
   ]);
 
   // 파도 배치 애니메이션 (행 단위로 순차 배치)
@@ -302,8 +303,8 @@ export default function MainWorkspace({
     const timer = setTimeout(() => {
       const currentRowAssignments = waveAssignments[currentWaveRow];
       // 현재 행의 모든 자리를 한 번에 배치
-      onAssignmentsChange((prev) =>
-        prev.map((a) => {
+      onAssignmentsChange(
+        assignments.map((a) => {
           const rowAssignment = currentRowAssignments.find(
             (wa) => wa.seat.r === a.seat.r && wa.seat.c === a.seat.c
           );
@@ -319,6 +320,7 @@ export default function MainWorkspace({
     waveAssignments,
     enableWaveAnimation,
     onAssignmentsChange,
+    assignments,
   ]);
 
   useEffect(() => {
