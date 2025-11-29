@@ -36,7 +36,7 @@ export async function getClassRosters(userId: string): Promise<ClassRoster[]> {
   const q = query(collection(db, `users/${userId}/classRosters`));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((doc) => {
-    const data = doc.data();
+    const data = doc.data() as Record<string, any>;
     return {
       id: doc.id,
       ...data,
@@ -91,7 +91,7 @@ export async function getLayouts(userId: string): Promise<Layout[]> {
   const q = query(collection(db, `users/${userId}/layouts`));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((doc) => {
-    const data = doc.data();
+    const data = doc.data() as Record<string, any>;
     return {
       id: doc.id,
       ...data,
@@ -225,7 +225,7 @@ export async function getNotices(): Promise<Notice[]> {
   const q = query(collection(db, "notices"), orderBy("createdAt", "desc"));
   const snapshot = await getDocs(q);
   const notices = snapshot.docs.map((doc) => {
-    const data = doc.data();
+    const data = doc.data() as Record<string, any>;
     return {
       id: doc.id,
       ...data,
@@ -323,7 +323,7 @@ export async function getFeedbacks(options?: GetFeedbacksOptions): Promise<Feedb
   
   const snapshot = await getDocs(q);
   let feedbacks = snapshot.docs.map((doc) => {
-    const data = doc.data();
+    const data = doc.data() as Record<string, any>;
     return {
       id: doc.id,
       ...data,
@@ -452,7 +452,7 @@ export async function getComments(postId: string, postType: PostType): Promise<C
     );
     const snapshot = await getDocs(q);
     const comments = snapshot.docs.map((doc) => {
-      const data = doc.data();
+      const data = doc.data() as Record<string, any>;
       return {
         id: doc.id,
         ...data,
@@ -472,7 +472,7 @@ export async function getComments(postId: string, postType: PostType): Promise<C
       );
       const snapshot = await getDocs(q);
       const comments = snapshot.docs.map((doc) => {
-        const data = doc.data();
+        const data = doc.data() as Record<string, any>;
         return {
           id: doc.id,
           ...data,
