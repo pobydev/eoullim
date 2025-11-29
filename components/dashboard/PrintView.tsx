@@ -72,24 +72,30 @@ export default function PrintView({
 
       <div
         className={cn(
-          "flex flex-col items-center w-full max-w-6xl mx-auto print:w-full print:max-w-none",
+          "flex flex-col items-center w-full max-w-6xl mx-auto print:w-full print:max-w-none rounded-2xl shadow-lg border border-gray-100 relative overflow-hidden px-8 py-24",
           viewMode === "teacher" && "transform rotate-180"
         )}
         style={{
           ...(viewMode === "teacher" ? { transform: "rotate(180deg)" } : {}),
+          // 교실 전체 배경 이미지 (컨테이너에 꽉 채움, 상단 기준)
+          backgroundImage: "url('/classroom-background.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "top center",
+          backgroundRepeat: "no-repeat",
         }}
       >
-        {/* 칠판/교탁 */}
-        <div
-          className="flex justify-center mb-6"
-          style={viewMode === "teacher" ? { transform: "rotate(180deg)" } : {}}
-        >
-          <div className="bg-slate-700 text-white px-28 py-4 rounded-lg text-lg font-semibold shadow-xl">
-            칠판
+        <div className="relative z-10 w-full">
+          {/* 칠판/교탁 */}
+          <div
+            className="flex justify-center mb-6"
+            style={viewMode === "teacher" ? { transform: "rotate(180deg)" } : {}}
+          >
+            <div className="bg-slate-700 text-white px-28 py-4 rounded-lg text-lg font-semibold shadow-xl">
+              칠판
+            </div>
           </div>
-        </div>
 
-        {/* 그리드 */}
+          {/* 그리드 */}
         {layoutType === "분단형" ? (
           // 분단형 레이아웃: 2열씩 그룹화, 그룹 간 큰 간격
           <div className="flex gap-12 justify-center mx-auto">
@@ -121,30 +127,29 @@ export default function PrintView({
                           <div
                             key={`${r}-${c}`}
                             className={cn(
-                              "w-full min-w-[120px] h-24 flex items-center justify-center border-2 rounded-md print:border-gray-400",
+                              "w-full min-w-[120px] h-24 flex items-center justify-center border-transparent rounded-lg relative",
                               !cell.isActive &&
-                                "bg-gray-100 border-gray-200 border-dashed",
+                                "opacity-0",
+                              cell.isActive &&
+                                "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
                               cell.isActive &&
                                 !assignment?.studentId &&
-                                "print:bg-transparent print:border-transparent",
-                              cell.isActive &&
-                                !assignment?.studentId &&
-                                "bg-white border-gray-300",
+                                "[&::before]:bg-[url('/desk-wood.png')]",
                               cell.isActive &&
                                 assignment?.studentId &&
                                 student &&
                                 student.gender === "M" &&
-                                "bg-primary/10 border",
+                                "[&::before]:bg-[url('/desk-wood-boy.png')] [&::before]:brightness-125",
                               cell.isActive &&
                                 assignment?.studentId &&
                                 student &&
                                 student.gender === "F" &&
-                                "bg-rose-50 border",
+                                "[&::before]:bg-[url('/desk-wood-girl.png')] [&::before]:brightness-110",
                               cell.isActive &&
                                 assignment?.studentId &&
                                 student &&
                                 !student.gender &&
-                                "bg-white border",
+                                "[&::before]:bg-[url('/desk-wood.png')]",
                               getZoneColorClass(cell.zoneId)
                             )}
                             style={
@@ -154,7 +159,7 @@ export default function PrintView({
                             }
                           >
                             {cell.isActive && (
-                              <div className="text-center px-2 w-full">
+                              <div className="text-center px-2 w-full relative z-10">
                                 {assignment?.studentId && student ? (
                                   <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
                                     {student.attendanceNumber && (
@@ -221,30 +226,29 @@ export default function PrintView({
                                 <div
                                   key={`${r}-${c}`}
                                   className={cn(
-                                    "w-full min-w-[120px] h-24 flex items-center justify-center border-2 rounded-md print:border-gray-400",
+                                    "w-full min-w-[120px] h-24 flex items-center justify-center border-transparent rounded-lg relative",
                                     !cell.isActive &&
-                                      "bg-gray-100 border-gray-200 border-dashed",
+                                      "opacity-0",
+                                    cell.isActive &&
+                                      "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
                                     cell.isActive &&
                                       !assignment?.studentId &&
-                                      "print:bg-transparent print:border-transparent",
-                                    cell.isActive &&
-                                      !assignment?.studentId &&
-                                      "bg-white border-gray-300",
+                                      "[&::before]:bg-[url('/desk-wood.png')]",
                                     cell.isActive &&
                                       assignment?.studentId &&
                                       student &&
                                       student.gender === "M" &&
-                                      "bg-primary/10 border",
+                                      "[&::before]:bg-[url('/desk-wood-boy.png')] [&::before]:brightness-125",
                                     cell.isActive &&
                                       assignment?.studentId &&
                                       student &&
                                       student.gender === "F" &&
-                                      "bg-rose-50 border",
+                                      "[&::before]:bg-[url('/desk-wood-girl.png')] [&::before]:brightness-110",
                                     cell.isActive &&
                                       assignment?.studentId &&
                                       student &&
                                       !student.gender &&
-                                      "bg-white border",
+                                      "[&::before]:bg-[url('/desk-wood.png')]",
                                     getZoneColorClass(cell.zoneId)
                                   )}
                                   style={
@@ -254,7 +258,7 @@ export default function PrintView({
                                   }
                                 >
                                   {cell.isActive && (
-                                    <div className="text-center px-2 w-full">
+                                    <div className="text-center px-2 w-full relative z-10">
                                       {assignment?.studentId && student ? (
                                         <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
                                           {student.attendanceNumber && (
@@ -304,30 +308,29 @@ export default function PrintView({
                   <div
                     key={`${r}-${c}`}
                     className={cn(
-                      "w-[120px] print:w-full print:min-w-[90px] h-24 print:h-[64px] flex items-center justify-center border-2 rounded-md print:border-gray-400",
+                      "w-[120px] print:w-full print:min-w-[90px] h-24 print:h-[64px] flex items-center justify-center border-transparent rounded-lg relative",
                       !cell.isActive &&
-                        "bg-gray-100 border-gray-200 border-dashed",
+                        "opacity-0",
+                      cell.isActive &&
+                        "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
                       cell.isActive &&
                         !assignment?.studentId &&
-                        "print:bg-transparent print:border-transparent",
-                      cell.isActive &&
-                        !assignment?.studentId &&
-                        "bg-white border-gray-300",
+                        "[&::before]:bg-[url('/desk-wood.png')]",
                       cell.isActive &&
                         assignment?.studentId &&
                         student &&
                         student.gender === "M" &&
-                        "bg-primary/10 border",
+                        "[&::before]:bg-[url('/desk-wood-boy.png')] [&::before]:brightness-125",
                       cell.isActive &&
                         assignment?.studentId &&
                         student &&
                         student.gender === "F" &&
-                        "bg-rose-50 border",
+                        "[&::before]:bg-[url('/desk-wood-girl.png')] [&::before]:brightness-110",
                       cell.isActive &&
                         assignment?.studentId &&
                         student &&
                         !student.gender &&
-                        "bg-white border",
+                        "[&::before]:bg-[url('/desk-wood.png')]",
                       getZoneColorClass(cell.zoneId)
                     )}
                     style={
@@ -337,7 +340,7 @@ export default function PrintView({
                     }
                   >
                     {cell.isActive && (
-                      <div className="text-center px-2 w-full">
+                      <div className="text-center px-2 w-full relative z-10">
                         {assignment?.studentId && student ? (
                           <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
                             {student.attendanceNumber && (
@@ -360,6 +363,7 @@ export default function PrintView({
             )}
           </div>
         )}
+        </div>
       </div>
     </div>
   );
