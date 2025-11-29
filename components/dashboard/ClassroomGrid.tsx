@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ClassRoster, Cell, SeatAssignment, Zone } from "@/types";
 import { Pin } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -38,6 +38,21 @@ export default function ClassroomGrid({
     r: number;
     c: number;
   } | null>(null);
+
+  // 이미지 프리로드
+  useEffect(() => {
+    const images = [
+      '/classroom-background.png',
+      '/desk-wood.png',
+      '/desk-wood-boy.png',
+      '/desk-wood-girl.png',
+    ];
+
+    images.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
 
   const getCell = (r: number, c: number) => {
     return cells.find((cell) => cell.r === r && cell.c === c);
