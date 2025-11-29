@@ -104,7 +104,10 @@ export default function PrintView({
           {/* 그리드 */}
           {layoutType === "분단형" ? (
             // 분단형 레이아웃: 2열씩 그룹화, 그룹 간 큰 간격
-            <div className="flex gap-12 justify-center mx-auto" style={{ marginTop: "60px" }}>
+            <div
+              className="flex gap-12 justify-center mx-auto"
+              style={{ marginTop: "60px" }}
+            >
               {Array.from({ length: Math.floor(cols / 2) }).map(
                 (_, groupIndex) => {
                   const startCol = groupIndex * 2;
@@ -136,7 +139,7 @@ export default function PrintView({
                                 "w-full min-w-[120px] h-24 flex items-center justify-center border-transparent rounded-lg relative",
                                 !cell.isActive && "opacity-0",
                                 cell.isActive &&
-                                  "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
+                                  "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0 [&::before]:[transform:inherit]",
                                 cell.isActive &&
                                   !assignment?.studentId &&
                                   "[&::before]:bg-[url('/desk-wood.png')]",
@@ -197,7 +200,10 @@ export default function PrintView({
             </div>
           ) : layoutType === "모둠형(4인)" ? (
             // 모둠형 레이아웃: 2열씩 그룹화, 특정 행 사이에 복도
-            <div className="flex gap-12 justify-center mx-auto" style={{ marginTop: "60px" }}>
+            <div
+              className="flex gap-12 justify-center mx-auto"
+              style={{ marginTop: "60px" }}
+            >
               {Array.from({ length: Math.floor(cols / 2) }).map(
                 (_, groupIndex) => {
                   const startCol = groupIndex * 2;
