@@ -71,6 +71,19 @@ export async function POST(request: NextRequest) {
       provider: "naver",
     });
     
+    // 사용자 정보 업데이트 (이메일 포함)
+    try {
+      await admin.auth().updateUser(uid, {
+        email: email,
+        emailVerified: false, // 네이버 이메일은 인증되지 않음
+        displayName: naverUser.name,
+        photoURL: naverUser.profile_image || undefined,
+      });
+    } catch (error) {
+      console.error("사용자 정보 업데이트 실패:", error);
+      // 업데이트 실패해도 토큰은 반환 (이미 생성됨)
+    }
+    
     return NextResponse.json({ customToken });
   } catch (error: any) {
     console.error("네이버 로그인 처리 실패:", error);

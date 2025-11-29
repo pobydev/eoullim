@@ -82,6 +82,19 @@ export async function POST(request: NextRequest) {
       provider: "kakao",
     });
     
+    // 사용자 정보 업데이트 (이메일 포함)
+    try {
+      await admin.auth().updateUser(uid, {
+        email: email,
+        emailVerified: false, // 카카오 이메일은 인증되지 않음
+        displayName: kakaoUser.profile?.nickname || undefined,
+        photoURL: kakaoUser.profile?.profile_image_url || undefined,
+      });
+    } catch (error) {
+      console.error("사용자 정보 업데이트 실패:", error);
+      // 업데이트 실패해도 토큰은 반환 (이미 생성됨)
+    }
+    
     return NextResponse.json({ customToken });
   } catch (error: any) {
     console.error("카카오 로그인 처리 실패:", error);
