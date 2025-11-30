@@ -117,6 +117,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         redirectUri
       )}&response_type=code&prompt=login&scope=profile_nickname,account_email,profile_image`;
 
+      console.log("카카오 로그인 Redirect URI:", redirectUri);
+      console.log("카카오 로그인 URL:", kakaoAuthUrl);
+
       window.location.href = kakaoAuthUrl;
     } catch (error) {
       console.error("카카오 로그인 실패:", error);
