@@ -169,7 +169,7 @@ export default function NoticeDetail({ noticeId }: NoticeDetailProps) {
         </CardHeader>
         <CardContent>
           <div
-            className="prose prose-sky max-w-none"
+            className="prose prose-sky max-w-none prose-headings:font-semibold prose-p:leading-relaxed prose-ul:list-disc prose-ol:list-decimal"
             dangerouslySetInnerHTML={{
               __html: sanitizeHtml(notice.content),
             }}
