@@ -45,17 +45,31 @@ export default function StudentList({
     attendanceNumber: students.length + 1,
   });
 
-
-
+  // 다이얼로그가 열릴 때 초기값 리셋
+  useEffect(() => {
+    if (isAddDialogOpen) {
+      setNewStudent({
+        name: "",
+        gender: undefined,
+        attendanceNumber: students.length + 1,
+      });
+    }
+  }, [isAddDialogOpen, students.length]);
 
   const handleAdd = () => {
-    if (!newStudent.name.trim()) return;
+    if (!newStudent.name.trim()) {
+      alert("학생 이름을 입력해주세요.");
+      return;
+    }
+    
+    // 성별이 없어도 추가 가능하도록 명시적으로 처리
     const student: Student = {
       id: `s${Date.now()}`,
       name: newStudent.name.trim(),
-      gender: newStudent.gender,
+      gender: newStudent.gender, // undefined도 허용
       attendanceNumber: newStudent.attendanceNumber,
     };
+    
     onStudentUpdate([...students, student]);
     setNewStudent({
       name: "",
