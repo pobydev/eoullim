@@ -29,8 +29,9 @@ export default function PrintView({
 }: PrintViewProps) {
   const [imagesLoaded, setImagesLoaded] = useState(false);
 
-  // 이미지 프리로드 - 로드 완료까지 기다림
+  // 이미지 프리로드 - 로드 완료까지 기다림 (레이아웃 변경 시에도 다시 로드)
   useEffect(() => {
+    setImagesLoaded(false);
     const images = [
       "/classroom-background.png",
       "/desk-wood.png",
@@ -42,7 +43,13 @@ export default function PrintView({
       return new Promise<void>((resolve) => {
         const img = new Image();
         img.onload = () => resolve();
-        img.onerror = () => resolve(); // 에러가 나도 계속 진행
+        img.onerror = () => {
+          // 에러 시 재시도
+          const retryImg = new Image();
+          retryImg.onload = () => resolve();
+          retryImg.onerror = () => resolve(); // 재시도 실패해도 계속 진행
+          retryImg.src = src;
+        };
         img.src = src;
       });
     });
@@ -50,7 +57,7 @@ export default function PrintView({
     Promise.all(loadPromises).then(() => {
       setImagesLoaded(true);
     });
-  }, []);
+  }, [rows, cols, layoutType]); // 레이아웃 변경 시 다시 로드
 
   const getCell = (r: number, c: number) => {
     return cells.find((cell) => cell.r === r && cell.c === c);
@@ -185,16 +192,16 @@ export default function PrintView({
                                         student.gender === "M"
                                           ? "text-sky-700"
                                           : student.gender === "F"
-                                          ? "text-rose-700"
-                                          : "text-white"
+                                          ? "text-pink-600"
+                                          : "text-amber-50"
                                       }`}>
                                         {student.attendanceNumber && (
-                                          <span className={`text-base font-normal ${
+                                          <span className={`text-sm font-normal ${
                                             student.gender === "M"
                                               ? "text-sky-600"
                                               : student.gender === "F"
-                                              ? "text-rose-600"
-                                              : "text-white/90"
+                                              ? "text-pink-500"
+                                              : "text-amber-100"
                                           } mr-1`}>
                                             {student.attendanceNumber}.
                                           </span>
@@ -301,16 +308,16 @@ export default function PrintView({
                                               student.gender === "M"
                                                 ? "text-sky-700"
                                                 : student.gender === "F"
-                                                ? "text-rose-700"
-                                                : "text-white"
+                                                ? "text-pink-600"
+                                                : "text-amber-50"
                                             }`}>
                                               {student.attendanceNumber && (
-                                                <span className={`text-base font-normal ${
+                                                <span className={`text-sm font-normal ${
                                                   student.gender === "M"
                                                     ? "text-sky-600"
                                                     : student.gender === "F"
-                                                    ? "text-rose-600"
-                                                    : "text-white/90"
+                                                    ? "text-pink-500"
+                                                    : "text-amber-100"
                                                 } mr-1`}>
                                                   {student.attendanceNumber}.
                                                 </span>
@@ -398,16 +405,16 @@ export default function PrintView({
                                 student.gender === "M"
                                   ? "text-sky-700"
                                   : student.gender === "F"
-                                  ? "text-rose-700"
-                                  : "text-white"
+                                  ? "text-pink-600"
+                                  : "text-amber-50"
                               }`}>
                                 {student.attendanceNumber && (
-                                  <span className={`text-base font-normal ${
+                                  <span className={`text-sm font-normal ${
                                     student.gender === "M"
                                       ? "text-sky-600"
                                       : student.gender === "F"
-                                      ? "text-rose-600"
-                                      : "text-white/90"
+                                      ? "text-pink-500"
+                                      : "text-amber-100"
                                   } mr-1`}>
                                     {student.attendanceNumber}.
                                   </span>
