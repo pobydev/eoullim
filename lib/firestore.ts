@@ -550,9 +550,22 @@ export async function deleteComment(commentId: string): Promise<void> {
 export async function isAdmin(userId: string, userEmail?: string): Promise<boolean> {
   // 초기 구현: 환경 변수에서 관리자 이메일 목록 확인
   // 나중에 Custom Claims로 확장 가능하도록 설계
-  if (!userEmail) return false;
+  if (!userEmail) {
+    console.log("[isAdmin] userEmail이 없습니다.");
+    return false;
+  }
   
-  const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(",").map((e) => e.trim()) || [];
-  return adminEmails.includes(userEmail);
+  const adminEmailsString = process.env.NEXT_PUBLIC_ADMIN_EMAILS;
+  console.log("[isAdmin] 환경 변수:", adminEmailsString);
+  console.log("[isAdmin] 사용자 이메일:", userEmail);
+  
+  const adminEmails = adminEmailsString?.split(",").map((e) => e.trim().toLowerCase()) || [];
+  const normalizedUserEmail = userEmail.toLowerCase().trim();
+  
+  console.log("[isAdmin] 관리자 이메일 목록:", adminEmails);
+  console.log("[isAdmin] 정규화된 사용자 이메일:", normalizedUserEmail);
+  console.log("[isAdmin] 관리자 여부:", adminEmails.includes(normalizedUserEmail));
+  
+  return adminEmails.includes(normalizedUserEmail);
 }
 

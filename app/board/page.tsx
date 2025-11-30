@@ -21,9 +21,14 @@ export default function BoardPage() {
   }, [user]);
 
   const checkAdmin = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log("[BoardPage] 사용자가 없습니다.");
+      return;
+    }
     try {
+      console.log("[BoardPage] 관리자 체크 시작 - 사용자:", user.email);
       const admin = await isAdmin(user.uid, user.email || undefined);
+      console.log("[BoardPage] 관리자 체크 결과:", admin);
       setIsUserAdmin(admin);
     } catch (error) {
       console.error("관리자 체크 실패:", error);
