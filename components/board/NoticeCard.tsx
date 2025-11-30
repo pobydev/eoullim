@@ -33,9 +33,6 @@ export default function NoticeCard({ notice }: NoticeCardProps) {
           </div>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-600 line-clamp-2 mb-4">
-            {notice.content.replace(/[#*`]/g, "").substring(0, 100)}
-          </p>
           <div className="flex items-center gap-4 text-xs text-gray-500">
             <span className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
