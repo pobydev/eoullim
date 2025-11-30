@@ -328,7 +328,9 @@ export default function ClassroomGrid({
                                   {assignment?.studentId && student ? (
                                     <div className="flex flex-col h-full relative">
                                       <div
-                                        className={`${cellTextSize} font-semibold truncate flex items-center justify-center h-full`}
+                                        className={`${cellTextSize} font-semibold truncate flex items-center justify-center h-full ${
+                                          !student.gender ? "text-white" : ""
+                                        }`}
                                       >
                                         {student.attendanceNumber && (
                                           <span
@@ -336,7 +338,9 @@ export default function ClassroomGrid({
                                               isFullscreen
                                                 ? "text-lg"
                                                 : "text-base"
-                                            } font-normal text-gray-500 mr-1`}
+                                            } font-normal ${
+                                              !student.gender ? "text-white/90" : "text-gray-500"
+                                            } mr-1`}
                                           >
                                             {student.attendanceNumber}.
                                           </span>
@@ -518,7 +522,9 @@ export default function ClassroomGrid({
                                         {assignment?.studentId && student ? (
                                           <div className="flex flex-col h-full relative">
                                             <div
-                                              className={`${cellTextSize} font-semibold truncate flex items-center justify-center h-full`}
+                                              className={`${cellTextSize} font-semibold truncate flex items-center justify-center h-full ${
+                                                !student.gender ? "text-white" : ""
+                                              }`}
                                             >
                                               {student.attendanceNumber && (
                                                 <span
@@ -526,7 +532,9 @@ export default function ClassroomGrid({
                                                     isFullscreen
                                                       ? "text-lg"
                                                       : "text-base"
-                                                  } font-normal text-gray-500 mr-1`}
+                                                  } font-normal ${
+                                                    !student.gender ? "text-white/90" : "text-gray-500"
+                                                  } mr-1`}
                                                 >
                                                   {student.attendanceNumber}.
                                                 </span>
@@ -718,13 +726,17 @@ export default function ClassroomGrid({
                           {assignment?.studentId && student ? (
                             <div className="flex flex-col h-full relative">
                               <div
-                                className={`${cellTextSize} font-semibold truncate flex items-center justify-center h-full`}
+                                className={`${cellTextSize} font-semibold truncate flex items-center justify-center h-full ${
+                                  !student.gender ? "text-white" : ""
+                                }`}
                               >
                                 {student.attendanceNumber && (
                                   <span
                                     className={`${
                                       isFullscreen ? "text-lg" : "text-base"
-                                    } font-normal text-gray-500 mr-1`}
+                                    } font-normal ${
+                                      !student.gender ? "text-white/90" : "text-gray-500"
+                                    } mr-1`}
                                   >
                                     {student.attendanceNumber}.
                                   </span>
