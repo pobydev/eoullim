@@ -39,6 +39,7 @@ NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id_here
 ```
 
 6. **Firestore 보안 규칙 설정**:
+
    - Firebase Console > Firestore Database > Rules로 이동
    - 프로젝트 루트의 `firestore.rules` 파일 내용을 복사하여 붙여넣기
    - **중요**: `isAdmin()` 함수 내의 admin 이메일 목록을 실제 관리자 이메일로 변경해야 합니다
@@ -72,7 +73,7 @@ pnpm dev
 
 - ✅ Google 로그인 인증
 - ✅ 반별 명단 관리 (추가/불러오기/저장)
-- ✅ 커스텀 그리드 설정 (최대 8x8)
+- ✅ 커스텀 그리드 설정 (기본형: 최대 7x7, 분단형: 최대 8행)
 - ✅ 좌석 활성화/비활성화
 - ✅ 다중 지정구역 설정 및 관리
 - ✅ 학생 속성 관리 (성별)
