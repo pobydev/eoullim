@@ -157,8 +157,7 @@ export default function PrintView({
                                   assignment?.studentId &&
                                   student &&
                                   !student.gender &&
-                                  "[&::before]:bg-[url('/desk-wood.png')]",
-                                getZoneColorClass(cell.zoneId)
+                                  "[&::before]:bg-[url('/desk-wood.png')]"
                               )}
                             >
                               {cell.isActive && (
@@ -262,8 +261,7 @@ export default function PrintView({
                                         assignment?.studentId &&
                                         student &&
                                         !student.gender &&
-                                        "[&::before]:bg-[url('/desk-wood.png')]",
-                                      getZoneColorClass(cell.zoneId)
+                                        "[&::before]:bg-[url('/desk-wood.png')]"
                                     )}
                                   >
                                     {cell.isActive && (
@@ -348,8 +346,7 @@ export default function PrintView({
                           assignment?.studentId &&
                           student &&
                           !student.gender &&
-                          "[&::before]:bg-[url('/desk-wood.png')]",
-                        getZoneColorClass(cell.zoneId)
+                          "[&::before]:bg-[url('/desk-wood.png')]"
                       )}
                     >
                       {cell.isActive && (
