@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ClassRoster, Cell, SeatAssignment, Zone } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
@@ -27,7 +27,9 @@ export default function PrintView({
   layoutType = "기본형",
   viewMode,
 }: PrintViewProps) {
-  // 이미지 프리로드
+  const [imagesLoaded, setImagesLoaded] = useState(false);
+
+  // 이미지 프리로드 - 로드 완료까지 기다림
   useEffect(() => {
     const images = [
       "/classroom-background.png",
@@ -36,9 +38,17 @@ export default function PrintView({
       "/desk-wood-girl.png",
     ];
 
-    images.forEach((src) => {
-      const img = new Image();
-      img.src = src;
+    const loadPromises = images.map((src) => {
+      return new Promise<void>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = () => resolve(); // 에러가 나도 계속 진행
+        img.src = src;
+      });
+    });
+
+    Promise.all(loadPromises).then(() => {
+      setImagesLoaded(true);
     });
   }, []);
 

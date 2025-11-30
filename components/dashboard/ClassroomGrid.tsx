@@ -38,8 +38,9 @@ export default function ClassroomGrid({
     r: number;
     c: number;
   } | null>(null);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
 
-  // 이미지 프리로드
+  // 이미지 프리로드 - 로드 완료까지 기다림
   useEffect(() => {
     const images = [
       "/classroom-background.png",
@@ -48,9 +49,17 @@ export default function ClassroomGrid({
       "/desk-wood-girl.png",
     ];
 
-    images.forEach((src) => {
-      const img = new Image();
-      img.src = src;
+    const loadPromises = images.map((src) => {
+      return new Promise<void>((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = () => resolve(); // 에러가 나도 계속 진행
+        img.src = src;
+      });
+    });
+
+    Promise.all(loadPromises).then(() => {
+      setImagesLoaded(true);
     });
   }, []);
 
