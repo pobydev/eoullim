@@ -338,7 +338,11 @@ export default function ClassroomGrid({
                                     <div className="flex flex-col h-full relative">
                                       <div
                                         className={`${cellTextSize} font-semibold truncate flex items-center justify-center h-full ${
-                                          !student.gender ? "text-white" : ""
+                                          student.gender === "M"
+                                            ? "text-sky-700"
+                                            : student.gender === "F"
+                                            ? "text-rose-700"
+                                            : "text-white"
                                         }`}
                                       >
                                         {student.attendanceNumber && (
@@ -348,7 +352,11 @@ export default function ClassroomGrid({
                                                 ? "text-lg"
                                                 : "text-base"
                                             } font-normal ${
-                                              !student.gender ? "text-white/90" : "text-gray-500"
+                                              student.gender === "M"
+                                                ? "text-sky-600"
+                                                : student.gender === "F"
+                                                ? "text-rose-600"
+                                                : "text-white/90"
                                             } mr-1`}
                                           >
                                             {student.attendanceNumber}.
@@ -532,7 +540,11 @@ export default function ClassroomGrid({
                                           <div className="flex flex-col h-full relative">
                                             <div
                                               className={`${cellTextSize} font-semibold truncate flex items-center justify-center h-full ${
-                                                !student.gender ? "text-white" : ""
+                                                student.gender === "M"
+                                                  ? "text-sky-700"
+                                                  : student.gender === "F"
+                                                  ? "text-rose-700"
+                                                  : "text-white"
                                               }`}
                                             >
                                               {student.attendanceNumber && (
@@ -542,7 +554,11 @@ export default function ClassroomGrid({
                                                       ? "text-lg"
                                                       : "text-base"
                                                   } font-normal ${
-                                                    !student.gender ? "text-white/90" : "text-gray-500"
+                                                    student.gender === "M"
+                                                      ? "text-sky-600"
+                                                      : student.gender === "F"
+                                                      ? "text-rose-600"
+                                                      : "text-white/90"
                                                   } mr-1`}
                                                 >
                                                   {student.attendanceNumber}.
@@ -736,7 +752,11 @@ export default function ClassroomGrid({
                             <div className="flex flex-col h-full relative">
                               <div
                                 className={`${cellTextSize} font-semibold truncate flex items-center justify-center h-full ${
-                                  !student.gender ? "text-white" : ""
+                                  student.gender === "M"
+                                    ? "text-sky-700"
+                                    : student.gender === "F"
+                                    ? "text-rose-700"
+                                    : "text-white"
                                 }`}
                               >
                                 {student.attendanceNumber && (
@@ -744,7 +764,11 @@ export default function ClassroomGrid({
                                     className={`${
                                       isFullscreen ? "text-lg" : "text-base"
                                     } font-normal ${
-                                      !student.gender ? "text-white/90" : "text-gray-500"
+                                      student.gender === "M"
+                                        ? "text-sky-600"
+                                        : student.gender === "F"
+                                        ? "text-rose-600"
+                                        : "text-white/90"
                                     } mr-1`}
                                   >
                                     {student.attendanceNumber}.
