@@ -171,9 +171,13 @@ export default function PrintView({
                                 >
                                   {assignment?.studentId && student ? (
                                     <div className="flex flex-col h-full relative">
-                                      <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
+                                      <div className={`font-semibold text-lg truncate flex items-center justify-center h-full ${
+                                        !student.gender ? "text-white" : ""
+                                      }`}>
                                         {student.attendanceNumber && (
-                                          <span className="text-base font-normal text-gray-500 mr-1">
+                                          <span className={`text-base font-normal ${
+                                            !student.gender ? "text-white/90" : "text-gray-500"
+                                          } mr-1`}>
                                             {student.attendanceNumber}.
                                           </span>
                                         )}
@@ -275,9 +279,13 @@ export default function PrintView({
                                       >
                                         {assignment?.studentId && student ? (
                                           <div className="flex flex-col h-full relative">
-                                            <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
+                                            <div className={`font-semibold text-lg truncate flex items-center justify-center h-full ${
+                                              !student.gender ? "text-white" : ""
+                                            }`}>
                                               {student.attendanceNumber && (
-                                                <span className="text-base font-normal text-gray-500 mr-1">
+                                                <span className={`text-base font-normal ${
+                                                  !student.gender ? "text-white/90" : "text-gray-500"
+                                                } mr-1`}>
                                                   {student.attendanceNumber}.
                                                 </span>
                                               )}
@@ -360,9 +368,13 @@ export default function PrintView({
                         >
                           {assignment?.studentId && student ? (
                             <div className="flex flex-col h-full relative">
-                              <div className="font-semibold text-lg truncate flex items-center justify-center h-full">
+                              <div className={`font-semibold text-lg truncate flex items-center justify-center h-full ${
+                                !student.gender ? "text-white" : ""
+                              }`}>
                                 {student.attendanceNumber && (
-                                  <span className="text-base font-normal text-gray-500 mr-1">
+                                  <span className={`text-base font-normal ${
+                                    !student.gender ? "text-white/90" : "text-gray-500"
+                                  } mr-1`}>
                                     {student.attendanceNumber}.
                                   </span>
                                 )}
