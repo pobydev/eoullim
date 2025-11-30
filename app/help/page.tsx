@@ -201,72 +201,6 @@ export default function HelpPage() {
               </CardContent>
             </Card>
 
-            {/* 배치 효과 */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-sky-500" />
-                  배치 효과
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-gray-600 text-sm">
-                  자리 배치 결과를 공개하는 방식을 선택할 수 있습니다. 우측
-                  패널의 '배치 효과' 섹션에서 선택합니다.
-                </p>
-                <div className="grid gap-3">
-                  <div className="flex items-start gap-3 p-3 border rounded-lg">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-yellow-100 text-yellow-600 flex items-center justify-center">
-                      <Bell className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-800 mb-1">
-                        카운트다운
-                      </div>
-                      <div className="text-gray-600 text-sm">
-                        3초 카운트다운 후 배치 결과가 공개됩니다. 종 아이콘이
-                        회전하며 효과음이 재생됩니다.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 border rounded-lg">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
-                      <Play className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-800 mb-1">
-                        순차 배치
-                      </div>
-                      <div className="text-gray-600 text-sm">
-                        학생들이 하나씩 랜덤한 순서로 배치됩니다. 학생 수에 따라
-                        자동으로 속도가 조절됩니다.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3 p-3 border rounded-lg">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center">
-                      <Waves className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-800 mb-1">
-                        파도 배치
-                      </div>
-                      <div className="text-gray-600 text-sm">
-                        앞줄부터 뒤줄까지 행 단위로 순차적으로 배치됩니다.
-                        파도처럼 앞에서 뒤로 배치되는 효과를 볼 수 있습니다.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-sky-50 p-4 rounded-lg">
-                  <p className="text-sm text-sky-800">
-                    <strong>💡 팁:</strong> 배치 효과는 하나만 선택할 수 있으며,
-                    선택하지 않으면 즉시 배치됩니다.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
             {/* 지정구역 */}
             <Card>
               <CardHeader>
@@ -362,6 +296,72 @@ export default function HelpPage() {
                       같은 분단 내에서 같은 성별끼리 짝이 되도록 배치합니다.
                     </div>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 배치 효과 */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-sky-500" />
+                  배치 효과
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-gray-600 text-sm">
+                  자리 배치 결과를 공개하는 방식을 선택할 수 있습니다. 우측
+                  패널의 '배치 효과' 섹션에서 선택합니다.
+                </p>
+                <div className="grid gap-3">
+                  <div className="flex items-start gap-3 p-3 border rounded-lg">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-yellow-100 text-yellow-600 flex items-center justify-center">
+                      <Bell className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-800 mb-1">
+                        카운트다운
+                      </div>
+                      <div className="text-gray-600 text-sm">
+                        3초 카운트다운 후 배치 결과가 공개됩니다. 종 아이콘이
+                        회전하며 효과음이 재생됩니다.
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 border rounded-lg">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">
+                      <Play className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-800 mb-1">
+                        순차 배치
+                      </div>
+                      <div className="text-gray-600 text-sm">
+                        학생들이 하나씩 랜덤한 순서로 배치됩니다. 학생 수에 따라
+                        자동으로 속도가 조절됩니다.
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 border rounded-lg">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center">
+                      <Waves className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-800 mb-1">
+                        파도 배치
+                      </div>
+                      <div className="text-gray-600 text-sm">
+                        앞줄부터 뒤줄까지 행 단위로 순차적으로 배치됩니다.
+                        파도처럼 앞에서 뒤로 배치되는 효과를 볼 수 있습니다.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-sky-50 p-4 rounded-lg">
+                  <p className="text-sm text-sky-800">
+                    <strong>💡 팁:</strong> 배치 효과는 하나만 선택할 수 있으며,
+                    선택하지 않으면 즉시 배치됩니다.
+                  </p>
                 </div>
               </CardContent>
             </Card>
