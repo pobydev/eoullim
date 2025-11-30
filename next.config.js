@@ -10,6 +10,10 @@ const nextConfig = {
             key: 'Cross-Origin-Opener-Policy',
             value: 'same-origin-allow-popups',
           },
+          {
+            key: 'Content-Security-Policy',
+            value: "font-src 'self' data: https: http:;",
+          },
         ],
       },
     ];
