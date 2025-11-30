@@ -125,6 +125,61 @@ export default function MainWorkspace({
   const [currentWaveRow, setCurrentWaveRow] = useState(0);
   const sequentialAudioRef = useRef<HTMLAudioElement | null>(null);
   const waveAudioRef = useRef<HTMLAudioElement | null>(null);
+  
+  // 음원 프리로드용 ref 추가
+  const countdownAudioRef = useRef<HTMLAudioElement | null>(null);
+  const completeAudioRef = useRef<HTMLAudioElement | null>(null);
+  const sequentialPreloadRef = useRef<HTMLAudioElement | null>(null);
+  const wavePreloadRef = useRef<HTMLAudioElement | null>(null);
+
+  // 컴포넌트 마운트 시 모든 음원 미리 로드
+  useEffect(() => {
+    // 카운트다운 음원 프리로드
+    try {
+      const countdownAudio = new Audio("/sounds/bell-countdown.wav");
+      countdownAudio.volume = 0.5;
+      countdownAudio.preload = "auto";
+      countdownAudio.load();
+      countdownAudioRef.current = countdownAudio;
+    } catch (error) {
+      // 음원 로드 실패 무시
+    }
+
+    // 완료 음원 프리로드
+    try {
+      const completeAudio = new Audio("/sounds/assignment-complete.mp3");
+      completeAudio.volume = 0.5;
+      completeAudio.preload = "auto";
+      completeAudio.load();
+      completeAudioRef.current = completeAudio;
+    } catch (error) {
+      // 음원 로드 실패 무시
+    }
+
+    // 순차 배치 루프 음원 프리로드
+    try {
+      const sequentialAudio = new Audio("/sounds/sequential-loop.mp3");
+      sequentialAudio.loop = true;
+      sequentialAudio.volume = 0.4;
+      sequentialAudio.preload = "auto";
+      sequentialAudio.load();
+      sequentialPreloadRef.current = sequentialAudio;
+    } catch (error) {
+      // 음원 로드 실패 무시
+    }
+
+    // 파도 배치 루프 음원 프리로드
+    try {
+      const waveAudio = new Audio("/sounds/wave-loop.mp3");
+      waveAudio.loop = true;
+      waveAudio.volume = 0.4;
+      waveAudio.preload = "auto";
+      waveAudio.load();
+      wavePreloadRef.current = waveAudio;
+    } catch (error) {
+      // 음원 로드 실패 무시
+    }
+  }, []); // 마운트 시 한 번만 실행
 
   useEffect(() => {
     if (!skipGridInit) {
@@ -145,13 +200,22 @@ export default function MainWorkspace({
   useEffect(() => {
     if (countdown === null || countdown <= 0) return;
 
-    // 효과음 재생 (각 카운트마다)
+    // 프리로드된 음원 사용 (cloneNode로 복사하여 동시 재생 가능)
     try {
-      const audio = new Audio("/sounds/bell-countdown.wav");
-      audio.volume = 0.5;
-      audio.play().catch(() => {
-        // 효과음 파일이 없어도 에러 무시
-      });
+      if (countdownAudioRef.current) {
+        const audio = countdownAudioRef.current.cloneNode() as HTMLAudioElement;
+        audio.volume = 0.5;
+        audio.play().catch(() => {
+          // 효과음 재생 실패 무시
+        });
+      } else {
+        // 프리로드가 아직 안 된 경우 fallback
+        const audio = new Audio("/sounds/bell-countdown.wav");
+        audio.volume = 0.5;
+        audio.play().catch(() => {
+          // 효과음 파일이 없어도 에러 무시
+        });
+      }
     } catch (error) {
       // 효과음 재생 실패 무시
     }
@@ -183,14 +247,25 @@ export default function MainWorkspace({
       !sequentialAudioRef.current
     ) {
       try {
-        const audio = new Audio("/sounds/sequential-loop.mp3");
-        audio.loop = true;
-        audio.volume = 0.4;
-        sequentialAudioRef.current = audio;
-
-        audio.play().catch((error) => {
-          // 효과음 재생 실패 무시
-        });
+        // 프리로드된 음원 사용
+        if (sequentialPreloadRef.current) {
+          const audio = sequentialPreloadRef.current.cloneNode() as HTMLAudioElement;
+          audio.loop = true;
+          audio.volume = 0.4;
+          sequentialAudioRef.current = audio;
+          audio.play().catch((error) => {
+            // 효과음 재생 실패 무시
+          });
+        } else {
+          // 프리로드가 아직 안 된 경우 fallback
+          const audio = new Audio("/sounds/sequential-loop.mp3");
+          audio.loop = true;
+          audio.volume = 0.4;
+          sequentialAudioRef.current = audio;
+          audio.play().catch((error) => {
+            // 효과음 재생 실패 무시
+          });
+        }
       } catch (error) {
         // 효과음 초기화 실패 무시
         sequentialAudioRef.current = null;
@@ -217,14 +292,25 @@ export default function MainWorkspace({
       !waveAudioRef.current
     ) {
       try {
-        const audio = new Audio("/sounds/wave-loop.mp3");
-        audio.loop = true;
-        audio.volume = 0.4;
-        waveAudioRef.current = audio;
-
-        audio.play().catch((error) => {
-          // 효과음 재생 실패 무시
-        });
+        // 프리로드된 음원 사용
+        if (wavePreloadRef.current) {
+          const audio = wavePreloadRef.current.cloneNode() as HTMLAudioElement;
+          audio.loop = true;
+          audio.volume = 0.4;
+          waveAudioRef.current = audio;
+          audio.play().catch((error) => {
+            // 효과음 재생 실패 무시
+          });
+        } else {
+          // 프리로드가 아직 안 된 경우 fallback
+          const audio = new Audio("/sounds/wave-loop.mp3");
+          audio.loop = true;
+          audio.volume = 0.4;
+          waveAudioRef.current = audio;
+          audio.play().catch((error) => {
+            // 효과음 재생 실패 무시
+          });
+        }
       } catch (error) {
         // 효과음 초기화 실패 무시
         waveAudioRef.current = null;
@@ -492,11 +578,20 @@ export default function MainWorkspace({
     } else {
       // 바로 배치 - 효과음 재생
       try {
-        const audio = new Audio("/sounds/assignment-complete.mp3");
-        audio.volume = 0.5;
-        audio.play().catch(() => {
-          // 효과음 재생 실패 무시
-        });
+        if (completeAudioRef.current) {
+          const audio = completeAudioRef.current.cloneNode() as HTMLAudioElement;
+          audio.volume = 0.5;
+          audio.play().catch(() => {
+            // 효과음 재생 실패 무시
+          });
+        } else {
+          // 프리로드가 아직 안 된 경우 fallback
+          const audio = new Audio("/sounds/assignment-complete.mp3");
+          audio.volume = 0.5;
+          audio.play().catch(() => {
+            // 효과음 재생 실패 무시
+          });
+        }
       } catch (error) {
         // 효과음 재생 실패 무시
       }
