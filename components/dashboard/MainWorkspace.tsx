@@ -615,18 +615,6 @@ export default function MainWorkspace({
             )}
           </div>
           <div className="flex gap-2">
-            {/* 게시판 및 도움말 버튼 */}
-            <Link href="/board">
-              <Button variant="ghost" size="sm" title="게시판">
-                <MessageSquare className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/help">
-              <Button variant="ghost" size="sm" title="도움말">
-                <HelpCircle className="h-4 w-4" />
-              </Button>
-            </Link>
-
             <Button
               onClick={() => setShowFullscreenView(true)}
               variant="outline"
