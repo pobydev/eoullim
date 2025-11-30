@@ -9,6 +9,21 @@ export default function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
+  // 이미지 프리로드 - 페이지 로드 시 즉시 시작
+  useEffect(() => {
+    const images = [
+      "/classroom-background.png",
+      "/desk-wood.png",
+      "/desk-wood-boy.png",
+      "/desk-wood-girl.png",
+    ];
+
+    images.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
   useEffect(() => {
     if (!loading && !user) {
       router.push("/");
