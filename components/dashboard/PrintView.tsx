@@ -139,7 +139,10 @@ export default function PrintView({
                                 "w-full min-w-[120px] h-24 flex items-center justify-center border-transparent rounded-lg relative",
                                 !cell.isActive && "opacity-0",
                                 cell.isActive &&
-                                  "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0 [&::before]:[transform:inherit]",
+                                  "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
+                                viewMode === "teacher" &&
+                                  cell.isActive &&
+                                  "[&::before]:[transform:rotate(180deg)]",
                                 cell.isActive &&
                                   !assignment?.studentId &&
                                   "[&::before]:bg-[url('/desk-wood.png')]",
@@ -160,11 +163,6 @@ export default function PrintView({
                                   "[&::before]:bg-[url('/desk-wood.png')]",
                                 getZoneColorClass(cell.zoneId)
                               )}
-                              style={
-                                viewMode === "teacher"
-                                  ? { transform: "rotate(180deg)" }
-                                  : {}
-                              }
                             >
                               {cell.isActive && (
                                 <div
@@ -246,6 +244,9 @@ export default function PrintView({
                                       !cell.isActive && "opacity-0",
                                       cell.isActive &&
                                         "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
+                                      viewMode === "teacher" &&
+                                        cell.isActive &&
+                                        "[&::before]:[transform:rotate(180deg)]",
                                       cell.isActive &&
                                         !assignment?.studentId &&
                                         "[&::before]:bg-[url('/desk-wood.png')]",
@@ -266,11 +267,6 @@ export default function PrintView({
                                         "[&::before]:bg-[url('/desk-wood.png')]",
                                       getZoneColorClass(cell.zoneId)
                                     )}
-                                    style={
-                                      viewMode === "teacher"
-                                        ? { transform: "rotate(180deg)" }
-                                        : {}
-                                    }
                                   >
                                     {cell.isActive && (
                                       <div
@@ -335,6 +331,9 @@ export default function PrintView({
                         !cell.isActive && "opacity-0",
                         cell.isActive &&
                           "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
+                        viewMode === "teacher" &&
+                          cell.isActive &&
+                          "[&::before]:[transform:rotate(180deg)]",
                         cell.isActive &&
                           !assignment?.studentId &&
                           "[&::before]:bg-[url('/desk-wood.png')]",
@@ -355,11 +354,6 @@ export default function PrintView({
                           "[&::before]:bg-[url('/desk-wood.png')]",
                         getZoneColorClass(cell.zoneId)
                       )}
-                      style={
-                        viewMode === "teacher"
-                          ? { transform: "rotate(180deg)" }
-                          : {}
-                      }
                     >
                       {cell.isActive && (
                         <div
