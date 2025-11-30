@@ -6,9 +6,10 @@ import DOMPurify from "dompurify";
  * @returns Sanitized HTML 문자열
  */
 export function sanitizeHtml(dirty: string): string {
+  // 클라이언트 사이드에서만 DOMPurify 사용
   if (typeof window === "undefined") {
-    // 서버 사이드에서는 기본적으로 HTML 태그 제거
-    return dirty.replace(/<[^>]*>/g, "");
+    // 서버 사이드에서는 원본 반환 (클라이언트에서 sanitize)
+    return dirty;
   }
 
   return DOMPurify.sanitize(dirty, {
@@ -51,6 +52,7 @@ export function sanitizeHtml(dirty: string): string {
     KEEP_CONTENT: true,
   });
 }
+
 
 
 
