@@ -73,8 +73,25 @@ export default function PrintView({
   };
 
   const handlePrint = () => {
-    // 인쇄 다이얼로그 열기 전에 사용자에게 안내
-    // 참고: 브라우저의 인쇄 설정에서 "헤더 및 푸터" 옵션을 끄면 완전히 제거됩니다
+    // 이미지가 로드되지 않았으면 기다림
+    if (!imagesLoaded) {
+      // 이미지 로드 대기
+      const checkImages = setInterval(() => {
+        if (imagesLoaded) {
+          clearInterval(checkImages);
+          window.print();
+        }
+      }, 100);
+      
+      // 최대 5초 대기
+      setTimeout(() => {
+        clearInterval(checkImages);
+        window.print();
+      }, 5000);
+      return;
+    }
+    
+    // 인쇄 다이얼로그 열기
     window.print();
   };
 
@@ -92,6 +109,18 @@ export default function PrintView({
     };
     return colorMap[zone.color] || "border-gray-400 border-2";
   };
+
+  // 이미지가 로드되지 않았으면 로딩 표시
+  if (!imagesLoaded) {
+    return (
+      <div className="p-8 bg-white flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-lg mb-2">이미지 로딩 중...</div>
+          <div className="text-sm text-gray-500">잠시만 기다려주세요</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-8 bg-white print:p-0 print:m-0 print:flex print:flex-col print:justify-center print:items-center print:min-h-screen">
