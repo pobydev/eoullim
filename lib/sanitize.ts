@@ -6,13 +6,29 @@ import DOMPurify from "dompurify";
  * @returns Sanitized HTML 문자열
  */
 export function sanitizeHtml(dirty: string): string {
-  // 클라이언트 사이드에서만 DOMPurify 사용
-  if (typeof window === "undefined") {
-    // 서버 사이드에서는 원본 반환 (클라이언트에서 sanitize)
-    return dirty;
+  // HTML 엔티티 디코딩 (이스케이프된 HTML을 원래대로 복원)
+  let decoded = dirty;
+  if (typeof document !== "undefined") {
+    const textarea = document.createElement("textarea");
+    textarea.innerHTML = dirty;
+    decoded = textarea.value;
+  } else {
+    // 서버 사이드에서는 간단한 디코딩
+    decoded = dirty
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
   }
 
-  return DOMPurify.sanitize(dirty, {
+  // 클라이언트 사이드에서만 DOMPurify 사용
+  if (typeof window === "undefined") {
+    // 서버 사이드에서는 디코딩된 원본 반환 (클라이언트에서 sanitize)
+    return decoded;
+  }
+
+  return DOMPurify.sanitize(decoded, {
     ALLOWED_TAGS: [
       "p",
       "br",
