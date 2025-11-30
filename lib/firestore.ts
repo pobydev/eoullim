@@ -25,10 +25,43 @@ if (typeof window !== "undefined" && !db) {
 export async function saveClassRoster(userId: string, roster: ClassRoster) {
   if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const rosterRef = doc(db, `users/${userId}/classRosters`, roster.id);
-  await setDoc(rosterRef, {
-    ...roster,
-    createdAt: Timestamp.now(),
+  
+  // students 배열에서 undefined 필드 제거
+  const cleanedStudents = roster.students.map((student) => {
+    const cleaned: any = {
+      id: student.id,
+      name: student.name,
+    };
+    if (student.attendanceNumber !== undefined) {
+      cleaned.attendanceNumber = student.attendanceNumber;
+    }
+    if (student.gender !== undefined) {
+      cleaned.gender = student.gender;
+    }
+    return cleaned;
   });
+  
+  // roster 객체에서 undefined 필드 제거
+  const rosterData: any = {
+    id: roster.id,
+    className: roster.className,
+    students: cleanedStudents,
+    createdAt: Timestamp.now(),
+  };
+  
+  // createdAt이 이미 있으면 유지 (업데이트 시)
+  if (roster.createdAt) {
+    rosterData.createdAt = Timestamp.fromDate(roster.createdAt);
+  }
+  
+  // undefined 값을 가진 필드 제거
+  Object.keys(rosterData).forEach((key) => {
+    if (rosterData[key] === undefined) {
+      delete rosterData[key];
+    }
+  });
+  
+  await setDoc(rosterRef, rosterData);
 }
 
 export async function getClassRosters(userId: string): Promise<ClassRoster[]> {
