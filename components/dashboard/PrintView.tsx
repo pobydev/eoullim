@@ -158,7 +158,7 @@ export default function PrintView({
                                 cell.isActive &&
                                   "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
                                 cell.isActive &&
-                                  !assignment?.studentId &&
+                                  (!assignment?.studentId || !student) &&
                                   "[&::before]:bg-[url('/desk-wood.png')]",
                                 cell.isActive &&
                                   assignment?.studentId &&
@@ -274,7 +274,7 @@ export default function PrintView({
                                       cell.isActive &&
                                         "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
                                       cell.isActive &&
-                                        !assignment?.studentId &&
+                                        (!assignment?.studentId || !student) &&
                                         "[&::before]:bg-[url('/desk-wood.png')]",
                                       cell.isActive &&
                                         assignment?.studentId &&
@@ -371,7 +371,7 @@ export default function PrintView({
                         cell.isActive &&
                           "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
                         cell.isActive &&
-                          !assignment?.studentId &&
+                          (!assignment?.studentId || !student) &&
                           "[&::before]:bg-[url('/desk-wood.png')]",
                         cell.isActive &&
                           assignment?.studentId &&
