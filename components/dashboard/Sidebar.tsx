@@ -128,7 +128,7 @@ export default function Sidebar({
   };
 
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col shadow-sm">
+    <div className="w-80 h-screen bg-white border-r border-gray-200 flex flex-col shadow-sm overflow-hidden">
       {/* 로고 섹션 */}
       <div 
         className="p-4 border-b border-gray-200 shadow-[0_2px_4px_rgba(0,0,0,0.08)] bg-gradient-to-br from-sky-50 via-white to-blue-50 cursor-pointer hover:bg-gradient-to-br hover:from-sky-100 hover:via-white hover:to-blue-100 transition-colors"
@@ -251,6 +251,24 @@ export default function Sidebar({
           />
         </TabsContent>
       </Tabs>
+
+      {/* 네비게이션 섹션 - 게시판 및 도움말 */}
+      <div className="p-4 border-t border-gray-200 bg-gradient-to-br from-sky-50 via-white to-blue-50 flex-shrink-0">
+        <div className="flex gap-2">
+          <Link href="/board" className="flex-1">
+            <Button variant="outline" className="w-full justify-center" size="sm">
+              <MessageSquare className="mr-2 h-4 w-4" />
+              게시판
+            </Button>
+          </Link>
+          <Link href="/help" className="flex-1">
+            <Button variant="outline" className="w-full justify-center" size="sm">
+              <HelpCircle className="mr-2 h-4 w-4" />
+              도움말
+            </Button>
+          </Link>
+        </div>
+      </div>
 
       {user && (
         <ProfileSettingsDialog
