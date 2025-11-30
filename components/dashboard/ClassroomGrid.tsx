@@ -42,10 +42,10 @@ export default function ClassroomGrid({
   // 이미지 프리로드
   useEffect(() => {
     const images = [
-      '/classroom-background.png',
-      '/desk-wood.png',
-      '/desk-wood-boy.png',
-      '/desk-wood-girl.png',
+      "/classroom-background.png",
+      "/desk-wood.png",
+      "/desk-wood-boy.png",
+      "/desk-wood-girl.png",
     ];
 
     images.forEach((src) => {
@@ -170,7 +170,7 @@ export default function ClassroomGrid({
   const cellIconSize = isFullscreen ? "h-4 w-4" : "h-3.5 w-3.5";
   const boardPadding = isFullscreen ? "px-32 py-5" : "px-28 py-4";
   const boardTextSize = isFullscreen ? "text-xl" : "text-lg";
-  
+
   // 컨테이너 최소 높이 계산 (5행 기준)
   // 각 행 높이 + 행 간 gap (gap-y-2 = 8px)
   const rowHeight = rows >= 6 ? 80 : 97;
@@ -216,9 +216,9 @@ export default function ClassroomGrid({
                 "flex gap-12 justify-center mx-auto",
                 isAnimating && "animate-pulse"
               )}
-              style={{ 
+              style={{
                 marginTop: "60px",
-                minHeight: rows < 5 ? `${minContainerHeight}px` : undefined
+                minHeight: rows < 5 ? `${minContainerHeight}px` : undefined,
               }}
             >
               {Array.from({ length: Math.floor(cols / 2) }).map(
@@ -393,9 +393,9 @@ export default function ClassroomGrid({
                 "flex gap-12 justify-center mx-auto",
                 isAnimating && "animate-pulse"
               )}
-              style={{ 
+              style={{
                 marginTop: "60px",
-                minHeight: rows < 5 ? `${minContainerHeight}px` : undefined
+                minHeight: rows < 5 ? `${minContainerHeight}px` : undefined,
               }}
             >
               {Array.from({ length: Math.floor(cols / 2) }).map(
@@ -598,9 +598,10 @@ export default function ClassroomGrid({
                   : `repeat(${cols}, minmax(0, 1fr))`,
                 ...(isFullscreen
                   ? { width: "fit-content" }
-                  : { 
+                  : {
                       maxWidth: `${cols * 121}px`,
-                      minHeight: rows < 5 ? `${minContainerHeight}px` : undefined
+                      minHeight:
+                        rows < 5 ? `${minContainerHeight}px` : undefined,
                     }),
               }}
             >
@@ -666,7 +667,28 @@ export default function ClassroomGrid({
                           student &&
                           !student.gender &&
                           "hover:bg-white/20 hover:border-gray-300",
-                        getZoneColorClass(cell.zoneId),
+                        // 기본형에서 지정구역 테두리를 ::after로 추가 (책상 이미지 위에 표시)
+                        layoutType === "기본형" &&
+                          cell.isActive &&
+                          cell.zoneId &&
+                          "[&::after]:content-[''] [&::after]:absolute [&::after]:inset-0 [&::after]:pointer-events-none [&::after]:z-[1] [&::after]:rounded-lg [&::after]:border-2",
+                        layoutType === "기본형" &&
+                          cell.isActive &&
+                          cell.zoneId &&
+                          (() => {
+                            const zone = zones.find((z) => z.id === cell.zoneId);
+                            if (!zone) return "";
+                            const colorMap: Record<string, string> = {
+                              lime: "[&::after]:border-lime-400",
+                              yellow: "[&::after]:border-yellow-400",
+                              rose: "[&::after]:border-rose-400",
+                              violet: "[&::after]:border-violet-400",
+                              orange: "[&::after]:border-orange-400",
+                            };
+                            return colorMap[zone.color] || "[&::after]:border-gray-400";
+                          })(),
+                        // 기본형이 아닐 때는 기존 방식 유지
+                        layoutType !== "기본형" && getZoneColorClass(cell.zoneId),
                         isSelected &&
                           student?.gender === "M" &&
                           "ring-2 ring-primary ring-offset-1 border-primary",
