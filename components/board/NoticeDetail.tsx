@@ -64,9 +64,6 @@ export default function NoticeDetail({ noticeId }: NoticeDetailProps) {
       setLoading(true);
       const data = await getNotice(noticeId);
       if (data) {
-        console.log("[NoticeDetail] Loaded notice content:", data.content);
-        console.log("[NoticeDetail] Content type:", typeof data.content);
-        console.log("[NoticeDetail] Content length:", data.content?.length);
         setNotice(data);
         // 조회수 증가 (세션 스토리지로 중복 방지)
         const viewedKey = `notice_viewed_${noticeId}`;
@@ -171,19 +168,12 @@ export default function NoticeDetail({ noticeId }: NoticeDetailProps) {
           </div>
         </CardHeader>
         <CardContent>
-          {(() => {
-            const sanitized = sanitizeHtml(notice.content);
-            console.log("[NoticeDetail] Rendering - Original:", notice.content);
-            console.log("[NoticeDetail] Rendering - Sanitized:", sanitized);
-            return (
-              <div
-                className="prose prose-sky max-w-none"
-                dangerouslySetInnerHTML={{
-                  __html: sanitized,
-                }}
-              />
-            );
-          })()}
+          <div
+            className="prose prose-sky max-w-none"
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHtml(notice.content),
+            }}
+          />
         </CardContent>
       </Card>
 
