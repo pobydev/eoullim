@@ -140,9 +140,6 @@ export default function PrintView({
                                 !cell.isActive && "opacity-0",
                                 cell.isActive &&
                                   "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
-                                viewMode === "teacher" &&
-                                  cell.isActive &&
-                                  "[&::before]:[transform:rotate(180deg)]",
                                 cell.isActive &&
                                   !assignment?.studentId &&
                                   "[&::before]:bg-[url('/desk-wood.png')]",
@@ -167,7 +164,11 @@ export default function PrintView({
                               {cell.isActive && (
                                 <div
                                   className="text-center px-2 w-full relative z-[2]"
-                                  style={{ transform: "translateY(-12px)" }}
+                                  style={{ 
+                                    transform: viewMode === "teacher"
+                                      ? "translateY(-12px) rotate(-180deg)"
+                                      : "translateY(-12px)"
+                                  }}
                                 >
                                   {assignment?.studentId && student ? (
                                     <div className="flex flex-col h-full relative">
@@ -244,9 +245,6 @@ export default function PrintView({
                                       !cell.isActive && "opacity-0",
                                       cell.isActive &&
                                         "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
-                                      viewMode === "teacher" &&
-                                        cell.isActive &&
-                                        "[&::before]:[transform:rotate(180deg)]",
                                       cell.isActive &&
                                         !assignment?.studentId &&
                                         "[&::before]:bg-[url('/desk-wood.png')]",
@@ -272,7 +270,9 @@ export default function PrintView({
                                       <div
                                         className="text-center px-2 w-full relative z-[2]"
                                         style={{
-                                          transform: "translateY(-12px)",
+                                          transform: viewMode === "teacher"
+                                            ? "translateY(-12px) rotate(-180deg)"
+                                            : "translateY(-12px)",
                                         }}
                                       >
                                         {assignment?.studentId && student ? (
@@ -331,9 +331,6 @@ export default function PrintView({
                         !cell.isActive && "opacity-0",
                         cell.isActive &&
                           "[&::before]:content-[''] [&::before]:absolute [&::before]:inset-[-14px] [&::before]:bg-cover [&::before]:bg-center [&::before]:bg-no-repeat [&::before]:rounded-lg [&::before]:pointer-events-none [&::before]:z-0",
-                        viewMode === "teacher" &&
-                          cell.isActive &&
-                          "[&::before]:[transform:rotate(180deg)]",
                         cell.isActive &&
                           !assignment?.studentId &&
                           "[&::before]:bg-[url('/desk-wood.png')]",
@@ -358,7 +355,11 @@ export default function PrintView({
                       {cell.isActive && (
                         <div
                           className="text-center px-2 w-full relative z-[2]"
-                          style={{ transform: "translateY(-15px)" }}
+                          style={{ 
+                            transform: viewMode === "teacher"
+                              ? "translateY(-15px) rotate(-180deg)"
+                              : "translateY(-15px)"
+                          }}
                         >
                           {assignment?.studentId && student ? (
                             <div className="flex flex-col h-full relative">
