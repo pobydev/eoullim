@@ -9,10 +9,16 @@ service cloud.firestore {
     // Helper function to check if user is admin
     // Note: Custom Claims를 사용하는 경우 request.auth.token.admin == true로 변경
     // 현재는 이메일 기반 체크를 사용하므로, 실제 admin 이메일 목록을 여기에 추가해야 함
+    // .env.local과 Vercel 환경 변수의 NEXT_PUBLIC_ADMIN_EMAILS와 동일하게 유지해야 함
     function isAdmin() {
       return isAuthenticated() && 
              (request.auth.token.admin == true || 
-              request.auth.token.email in ['admin@example.com']); // 실제 admin 이메일로 변경
+              request.auth.token.email in [
+                'catem86@gmail.com','catem8686@gmail.com',
+                // 여기에 추가 관리자 이메일을 추가하세요
+                // 예: 'admin2@example.com',
+                // 예: 'admin3@example.com',
+              ]); // 관리자 이메일 목록
     }
     
     // Helper function to check if user is the author
