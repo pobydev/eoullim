@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     const userData = await userResponse.json();
     console.log("카카오 사용자 정보 응답:", JSON.stringify(userData, null, 2));
-    
+
     // 카카오 사용자 ID 확인
     if (!userData.id) {
       console.error("카카오 사용자 ID가 없습니다:", userData);
@@ -72,8 +72,15 @@ export async function POST(request: NextRequest) {
     // Firebase UID 생성
     const uid = `kakao_${userData.id}`;
     const email = kakaoUser?.email || `${uid}@kakao.local`;
-    const displayName = kakaoUser?.profile?.nickname || kakaoProfile?.nickname || kakaoProfile?.nick_name || "카카오 사용자";
-    const photoURL = kakaoUser?.profile?.profile_image_url || kakaoProfile?.profile_image || kakaoProfile?.thumbnail_image;
+    const displayName =
+      kakaoUser?.profile?.nickname ||
+      kakaoProfile?.nickname ||
+      kakaoProfile?.nick_name ||
+      "카카오 사용자";
+    const photoURL =
+      kakaoUser?.profile?.profile_image_url ||
+      kakaoProfile?.profile_image ||
+      kakaoProfile?.thumbnail_image;
 
     // Firebase Admin이 초기화되지 않았으면 에러
     if (!admin.apps.length) {

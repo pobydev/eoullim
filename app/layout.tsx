@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from "./providers";
+import { Analytics } from "@vercel/analytics/react";
 
 const pretendard = localFont({
   src: [
@@ -44,6 +45,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={pretendard.variable}>
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );
