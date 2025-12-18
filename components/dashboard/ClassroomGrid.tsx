@@ -179,10 +179,10 @@ export default function ClassroomGrid({
     ? "h-[80px]"
     : "h-[97px]";
   const cellTextSize = isFullscreen
-    ? "text-lg"
+    ? "text-2xl"
     : rows >= 6
-    ? "text-sm"
-    : "text-base";
+    ? "text-base"
+    : "text-lg";
   const cellIconSize = isFullscreen ? "h-4 w-4" : "h-3.5 w-3.5";
   const boardPadding = isFullscreen ? "px-32 py-5" : "px-28 py-4";
   const boardTextSize = isFullscreen ? "text-xl" : "text-lg";
@@ -344,7 +344,7 @@ export default function ClassroomGrid({
                                   {assignment?.studentId && student ? (
                                     <div className="flex flex-col h-full relative">
                                       <div
-                                        className={`${cellTextSize} font-semibold truncate flex items-center justify-center h-full ${
+                                        className={`${cellTextSize} font-bold truncate flex items-center justify-center h-full ${
                                           student.gender === "M"
                                             ? "text-sky-700"
                                             : student.gender === "F"
@@ -356,10 +356,10 @@ export default function ClassroomGrid({
                                           <span
                                             className={`${
                                               isFullscreen
+                                                ? "text-xl"
+                                                : cellTextSize === "text-lg"
                                                 ? "text-base"
-                                                : cellTextSize === "text-base"
-                                                ? "text-sm"
-                                                : "text-xs"
+                                                : "text-sm"
                                             } font-normal ${
                                               student.gender === "M"
                                                 ? "text-sky-600"
@@ -548,7 +548,7 @@ export default function ClassroomGrid({
                                         {assignment?.studentId && student ? (
                                           <div className="flex flex-col h-full relative">
                                             <div
-                                              className={`${cellTextSize} font-semibold truncate flex items-center justify-center h-full ${
+                                              className={`${cellTextSize} font-bold truncate flex items-center justify-center h-full ${
                                                 student.gender === "M"
                                                   ? "text-sky-700"
                                                   : student.gender === "F"
@@ -762,7 +762,7 @@ export default function ClassroomGrid({
                           {assignment?.studentId && student ? (
                             <div className="flex flex-col h-full relative">
                               <div
-                                className={`${cellTextSize} font-semibold truncate flex items-center justify-center h-full ${
+                                className={`${cellTextSize} font-bold truncate flex items-center justify-center h-full ${
                                   student.gender === "M"
                                     ? "text-sky-700"
                                     : student.gender === "F"
@@ -774,10 +774,10 @@ export default function ClassroomGrid({
                                   <span
                                     className={`${
                                       isFullscreen
+                                        ? "text-xl"
+                                        : cellTextSize === "text-lg"
                                         ? "text-base"
-                                        : cellTextSize === "text-base"
-                                        ? "text-sm"
-                                        : "text-xs"
+                                        : "text-sm"
                                     } font-normal ${
                                       student.gender === "M"
                                         ? "text-sky-600"
