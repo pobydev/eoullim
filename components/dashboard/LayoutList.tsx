@@ -141,7 +141,19 @@ export default function LayoutList({
                   ? "border-sky-500 bg-sky-50"
                   : "hover:bg-gray-50"
               }`}
-              onClick={() => onSelectLayout(layout)}
+              onClick={() => {
+                // 같은 레이아웃을 다시 선택해도 useEffect가 실행되도록
+                // 먼저 null로 설정한 후 다시 설정
+                if (selectedLayout?.id === layout.id) {
+                  onSelectLayout(null);
+                  // 다음 틱에서 다시 설정
+                  setTimeout(() => {
+                    onSelectLayout(layout);
+                  }, 0);
+                } else {
+                  onSelectLayout(layout);
+                }
+              }}
             >
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center justify-between">
