@@ -646,6 +646,16 @@ export default function MainWorkspace({
       return;
     }
 
+    // assignments가 제대로 전달되는지 확인
+    const assignmentsToSave = assignments.filter(
+      (a) => a.studentId !== null
+    );
+    
+    if (assignmentsToSave.length === 0) {
+      alert("저장할 자리 배정이 없습니다. 먼저 자리 배치를 진행해주세요.");
+      return;
+    }
+
     const layout: Layout = {
       id: `layout-${Date.now()}`,
       title: layoutTitle.trim(),
@@ -658,7 +668,7 @@ export default function MainWorkspace({
         zones,
       },
       cells,
-      currentAssignment: assignments,
+      currentAssignment: assignments, // 모든 assignments 저장 (빈 자리 포함)
       zoneStudentMapping:
         zoneStudentMapping.length > 0 ? zoneStudentMapping : undefined,
     };
