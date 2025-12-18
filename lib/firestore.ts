@@ -103,11 +103,26 @@ export async function saveLayout(userId: string, layout: Layout) {
   if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const layoutRef = doc(db, `users/${userId}/layouts`, layout.id);
   
-  // undefined 값을 가진 필드를 제거하여 Firestore 저장 오류 방지
+  // currentAssignment를 명시적으로 직렬화하여 저장
   const layoutData: any = {
-    ...layout,
+    id: layout.id,
+    title: layout.title,
+    classId: layout.classId,
+    config: layout.config,
+    cells: layout.cells,
+    currentAssignment: layout.currentAssignment || [], // 명시적으로 배열로 저장
     createdAt: Timestamp.now(),
   };
+  
+  // zoneStudentMapping이 있으면 추가
+  if (layout.zoneStudentMapping && layout.zoneStudentMapping.length > 0) {
+    layoutData.zoneStudentMapping = layout.zoneStudentMapping;
+  }
+  
+  // createdAt이 이미 있으면 유지 (업데이트 시)
+  if (layout.createdAt) {
+    layoutData.createdAt = Timestamp.fromDate(layout.createdAt);
+  }
   
   // undefined 값을 가진 필드 제거
   Object.keys(layoutData).forEach((key) => {
@@ -128,6 +143,7 @@ export async function getLayouts(userId: string): Promise<Layout[]> {
     return {
       id: doc.id,
       ...data,
+      currentAssignment: data.currentAssignment || [], // 명시적으로 배열로 복원
       createdAt: data.createdAt?.toDate(),
     } as Layout;
   });
@@ -141,10 +157,12 @@ export async function getLayout(
   const layoutRef = doc(db, `users/${userId}/layouts`, layoutId);
   const snapshot = await getDoc(layoutRef);
   if (!snapshot.exists()) return null;
+  const data = snapshot.data();
   return {
     id: snapshot.id,
-    ...snapshot.data(),
-    createdAt: snapshot.data().createdAt?.toDate(),
+    ...data,
+    currentAssignment: data.currentAssignment || [], // 명시적으로 배열로 복원
+    createdAt: data.createdAt?.toDate(),
   } as Layout;
 }
 
