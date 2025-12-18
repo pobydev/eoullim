@@ -51,8 +51,8 @@ export default function FullscreenView({
         const scaleX = containerWidth / gridWidth;
         const scaleY = containerHeight / gridHeight;
         
-        // 비율을 유지하면서 화면에 맞게 조정 (최소 0.5, 최대 3)
-        const newScale = Math.max(0.5, Math.min(scaleX, scaleY, 3));
+        // 비율을 유지하면서 화면에 맞게 조정 (최소 0.5, 최대 5)
+        const newScale = Math.max(0.5, Math.min(scaleX, scaleY, 5));
         setScale(newScale);
       }, 100);
     };

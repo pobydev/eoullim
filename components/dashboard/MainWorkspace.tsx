@@ -411,6 +411,9 @@ export default function MainWorkspace({
 
   useEffect(() => {
     if (selectedLayout) {
+      // rows/cols 변경 전에 skipGridInit을 true로 설정하여
+      // [rows, cols] useEffect에서 initializeGrid()가 호출되지 않도록 함
+      setSkipGridInit(true);
       setRows(selectedLayout.config.rows);
       setCols(selectedLayout.config.cols);
       setLayoutType(selectedLayout.config.layoutType || "기본형");

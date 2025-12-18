@@ -63,7 +63,12 @@ export function generateLayout(
     lockedAssignments.map((a) => a.studentId).filter((id): id is string => !!id)
   );
 
-  // 지정구역 내에서 인접한 셀 쌍 찾기 헬퍼 함수
+  // 같은 분단 내인지 확인 (분단형: 0-1, 2-3, 4-5... 열이 같은 분단)
+  const isSameDivision = (col1: number, col2: number): boolean => {
+    return Math.floor(col1 / 2) === Math.floor(col2 / 2);
+  };
+
+  // 지정구역 내에서 인접한 셀 쌍 찾기 헬퍼 함수 (같은 분단 내에서만)
   const findAdjacentPairInCells = (
     cells: Cell[],
     usedCells: Cell[]
@@ -71,11 +76,12 @@ export function generateLayout(
     for (const cell1 of cells) {
       if (usedCells.includes(cell1)) continue;
 
-      // 같은 행에서 인접한 열 찾기
+      // 같은 행, 같은 분단 내에서 인접한 열 찾기
       const cell2 = cells.find(
         (c) =>
           c.r === cell1.r &&
           Math.abs(c.c - cell1.c) === 1 &&
+          isSameDivision(cell1.c, c.c) && // 같은 분단 내에서만
           !usedCells.includes(c)
       );
 
@@ -379,36 +385,95 @@ export function generateLayout(
         }
       }
 
-      // 남은 학생들(성별 없는 학생 포함)을 랜덤 배치
-      const remainingAfterPairs = [
-        ...unassignedStudents.filter(
-          (s) =>
-            !assignments.some(
-              (a) =>
-                a.studentId === s.id &&
-                usedCells.some((c) => c.r === a.seat.r && c.c === a.seat.c)
-            )
-        ),
-        ...noGenderStudents,
-      ];
+      // 남은 학생들(성별 없는 학생 포함)을 성별 옵션에 맞게 배치
+      const remainingAfterPairs = unassignedStudents.filter(
+        (s) =>
+          !assignments.some(
+            (a) =>
+              a.studentId === s.id &&
+              usedCells.some((c) => c.r === a.seat.r && c.c === a.seat.c)
+          )
+      );
       const remainingAfterPairsCells = remainingCells.filter(
         (c) => !usedCells.includes(c)
       );
 
-      const shuffledRemaining = shuffleArray(remainingAfterPairs);
-      const shuffledRemainingCells = shuffleArray(remainingAfterPairsCells);
+      // 인접 자리에 다른 성별 학생이 있는 자리를 우선 배치 (남녀 짝)
+      const getAdjacentStudentGender = (cell: Cell): "M" | "F" | null => {
+        const adjacentCell = activeCells.find(
+          (c) =>
+            c.r === cell.r &&
+            Math.abs(c.c - cell.c) === 1 &&
+            isSameDivision(cell.c, c.c)
+        );
+        if (!adjacentCell) return null;
+        const adjacentAssignment = assignments.find(
+          (a) => a.seat.r === adjacentCell.r && a.seat.c === adjacentCell.c
+        );
+        if (!adjacentAssignment?.studentId) return null;
+        const adjacentStudent = students.find(
+          (s) => s.id === adjacentAssignment.studentId
+        );
+        return adjacentStudent?.gender || null;
+      };
+
+      // 남은 학생들을 성별별로 분류
+      const remainingMale = remainingAfterPairs.filter((s) => s.gender === "M");
+      const remainingFemale = remainingAfterPairs.filter((s) => s.gender === "F");
+      const remainingNoGender = remainingAfterPairs.filter((s) => !s.gender);
+
+      // 인접에 여학생이 있는 자리에 남학생 배치, 인접에 남학생이 있는 자리에 여학생 배치
+      const shuffledRemainingMale = shuffleArray(remainingMale);
+      const shuffledRemainingFemale = shuffleArray(remainingFemale);
+      let maleIndex = 0;
+      let femaleIndex = 0;
+
+      for (const cell of shuffleArray(remainingAfterPairsCells)) {
+        const assignment = assignments.find(
+          (a) => a.seat.r === cell.r && a.seat.c === cell.c
+        );
+        if (!assignment || assignment.studentId) continue;
+
+        const adjacentGender = getAdjacentStudentGender(cell);
+        
+        if (adjacentGender === "F" && maleIndex < shuffledRemainingMale.length) {
+          // 인접에 여학생이 있으면 남학생 배치
+          assignment.studentId = shuffledRemainingMale[maleIndex].id;
+          maleIndex++;
+        } else if (adjacentGender === "M" && femaleIndex < shuffledRemainingFemale.length) {
+          // 인접에 남학생이 있으면 여학생 배치
+          assignment.studentId = shuffledRemainingFemale[femaleIndex].id;
+          femaleIndex++;
+        }
+      }
+
+      // 아직 배치되지 않은 학생들 랜덤 배치
+      const stillRemaining = [
+        ...shuffledRemainingMale.slice(maleIndex),
+        ...shuffledRemainingFemale.slice(femaleIndex),
+        ...remainingNoGender,
+      ];
+      const stillRemainingCells = remainingAfterPairsCells.filter((c) => {
+        const assignment = assignments.find(
+          (a) => a.seat.r === c.r && a.seat.c === c.c
+        );
+        return assignment && !assignment.studentId;
+      });
+
+      const shuffledStillRemaining = shuffleArray(stillRemaining);
+      const shuffledStillRemainingCells = shuffleArray(stillRemainingCells);
 
       for (
         let i = 0;
-        i < Math.min(shuffledRemaining.length, shuffledRemainingCells.length);
+        i < Math.min(shuffledStillRemaining.length, shuffledStillRemainingCells.length);
         i++
       ) {
-        const cell = shuffledRemainingCells[i];
+        const cell = shuffledStillRemainingCells[i];
         const assignment = assignments.find(
           (a) => a.seat.r === cell.r && a.seat.c === cell.c
         );
         if (assignment && !assignment.studentId) {
-          assignment.studentId = shuffledRemaining[i].id;
+          assignment.studentId = shuffledStillRemaining[i].id;
         }
       }
     } else if (genderOption === "동성 짝") {
@@ -464,36 +529,95 @@ export function generateLayout(
         }
       }
 
-      // 남은 학생들(성별 없는 학생 포함)을 랜덤 배치
-      const remainingAfterPairs = [
-        ...unassignedStudents.filter(
-          (s) =>
-            !assignments.some(
-              (a) =>
-                a.studentId === s.id &&
-                usedCells.some((c) => c.r === a.seat.r && c.c === a.seat.c)
-            )
-        ),
-        ...noGenderStudents,
-      ];
+      // 남은 학생들을 성별 옵션에 맞게 배치 (동성 짝)
+      const remainingAfterPairs = unassignedStudents.filter(
+        (s) =>
+          !assignments.some(
+            (a) =>
+              a.studentId === s.id &&
+              usedCells.some((c) => c.r === a.seat.r && c.c === a.seat.c)
+          )
+      );
       const remainingAfterPairsCells = remainingCells.filter(
         (c) => !usedCells.includes(c)
       );
 
-      const shuffledRemaining = shuffleArray(remainingAfterPairs);
-      const shuffledRemainingCells = shuffleArray(remainingAfterPairsCells);
+      // 인접 자리에 같은 성별 학생이 있는 자리를 우선 배치 (동성 짝)
+      const getAdjacentStudentGender = (cell: Cell): "M" | "F" | null => {
+        const adjacentCell = activeCells.find(
+          (c) =>
+            c.r === cell.r &&
+            Math.abs(c.c - cell.c) === 1 &&
+            isSameDivision(cell.c, c.c)
+        );
+        if (!adjacentCell) return null;
+        const adjacentAssignment = assignments.find(
+          (a) => a.seat.r === adjacentCell.r && a.seat.c === adjacentCell.c
+        );
+        if (!adjacentAssignment?.studentId) return null;
+        const adjacentStudent = students.find(
+          (s) => s.id === adjacentAssignment.studentId
+        );
+        return adjacentStudent?.gender || null;
+      };
+
+      // 남은 학생들을 성별별로 분류
+      const remainingMale = remainingAfterPairs.filter((s) => s.gender === "M");
+      const remainingFemale = remainingAfterPairs.filter((s) => s.gender === "F");
+      const remainingNoGender = remainingAfterPairs.filter((s) => !s.gender);
+
+      // 인접에 남학생이 있는 자리에 남학생 배치, 인접에 여학생이 있는 자리에 여학생 배치
+      const shuffledRemainingMale = shuffleArray(remainingMale);
+      const shuffledRemainingFemale = shuffleArray(remainingFemale);
+      let maleIndex = 0;
+      let femaleIndex = 0;
+
+      for (const cell of shuffleArray(remainingAfterPairsCells)) {
+        const assignment = assignments.find(
+          (a) => a.seat.r === cell.r && a.seat.c === cell.c
+        );
+        if (!assignment || assignment.studentId) continue;
+
+        const adjacentGender = getAdjacentStudentGender(cell);
+        
+        if (adjacentGender === "M" && maleIndex < shuffledRemainingMale.length) {
+          // 인접에 남학생이 있으면 남학생 배치
+          assignment.studentId = shuffledRemainingMale[maleIndex].id;
+          maleIndex++;
+        } else if (adjacentGender === "F" && femaleIndex < shuffledRemainingFemale.length) {
+          // 인접에 여학생이 있으면 여학생 배치
+          assignment.studentId = shuffledRemainingFemale[femaleIndex].id;
+          femaleIndex++;
+        }
+      }
+
+      // 아직 배치되지 않은 학생들 랜덤 배치
+      const stillRemaining = [
+        ...shuffledRemainingMale.slice(maleIndex),
+        ...shuffledRemainingFemale.slice(femaleIndex),
+        ...remainingNoGender,
+      ];
+      const stillRemainingCells = remainingAfterPairsCells.filter((c) => {
+        const assignment = assignments.find(
+          (a) => a.seat.r === c.r && a.seat.c === c.c
+        );
+        return assignment && !assignment.studentId;
+      });
+
+      const shuffledStillRemaining = shuffleArray(stillRemaining);
+      const shuffledStillRemainingCells = shuffleArray(stillRemainingCells);
 
       for (
         let i = 0;
-        i < Math.min(shuffledRemaining.length, shuffledRemainingCells.length);
+        i < Math.min(shuffledStillRemaining.length, shuffledStillRemainingCells.length);
         i++
       ) {
-        const cell = shuffledRemainingCells[i];
+        const cell = shuffledStillRemainingCells[i];
         const assignment = assignments.find(
           (a) => a.seat.r === cell.r && a.seat.c === cell.c
         );
         if (assignment && !assignment.studentId) {
-          assignment.studentId = shuffledRemaining[i].id;
+          assignment.studentId = shuffledStillRemaining[i].id;
         }
       }
     }

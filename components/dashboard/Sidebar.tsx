@@ -93,12 +93,21 @@ export default function Sidebar({
     }
   };
 
-  // layoutRefreshKey가 변경될 때 목록 새로고침
+  // 학급이 선택되어 있고 레이아웃이 로드되었을 때, 가장 최근 레이아웃 자동 선택
   useEffect(() => {
-    if (user && layoutRefreshKey !== undefined && layoutRefreshKey > 0) {
-      loadData();
+    if (selectedRoster && layouts.length > 0 && !selectedLayout) {
+      const classLayouts = layouts.filter((layout) => layout.classId === selectedRoster.id);
+      if (classLayouts.length > 0) {
+        // createdAt 기준으로 정렬하여 가장 최근 것 선택
+        const sortedLayouts = [...classLayouts].sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA; // 최신순
+        });
+        onSelectLayout(sortedLayouts[0]);
+      }
     }
-  }, [layoutRefreshKey]);
+  }, [selectedRoster, layouts, selectedLayout, onSelectLayout]);
 
   const handleDeleteRoster = async (rosterId: string) => {
     if (!user) return;
@@ -127,15 +136,39 @@ export default function Sidebar({
     }
   };
 
+  // 학급 선택 시 가장 최근 레이아웃 자동 선택
+  const handleSelectRoster = (roster: ClassRoster | null) => {
+    onSelectRoster(roster);
+    
+    if (roster) {
+      // 해당 학급의 레이아웃 중 가장 최근 것을 찾기
+      const classLayouts = layouts.filter((layout) => layout.classId === roster.id);
+      if (classLayouts.length > 0) {
+        // createdAt 기준으로 정렬하여 가장 최근 것 선택
+        const sortedLayouts = [...classLayouts].sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA; // 최신순
+        });
+        onSelectLayout(sortedLayouts[0]);
+      } else {
+        // 해당 학급의 레이아웃이 없으면 레이아웃 선택 해제
+        onSelectLayout(null);
+      }
+    } else {
+      // 학급 선택 해제 시 레이아웃도 해제
+      onSelectLayout(null);
+    }
+  };
+
   return (
     <div className="w-80 h-screen bg-white border-r border-gray-200 flex flex-col shadow-sm overflow-hidden">
       {/* 로고 섹션 */}
       <div 
         className="p-4 border-b border-gray-200 shadow-[0_2px_4px_rgba(0,0,0,0.08)] bg-gradient-to-br from-sky-50 via-white to-blue-50 cursor-pointer hover:bg-gradient-to-br hover:from-sky-100 hover:via-white hover:to-blue-100 transition-colors"
         onClick={() => {
-          // 선택된 학급과 레이아웃 초기화 (새로고침 효과)
-          onSelectRoster(null);
-          onSelectLayout(null);
+          // 데이터만 새로고침 (현재 선택 상태 유지)
+          loadData();
           router.refresh();
         }}
       >
@@ -219,7 +252,7 @@ export default function Sidebar({
           <RosterManager
             rosters={rosters}
             selectedRoster={selectedRoster}
-            onSelectRoster={onSelectRoster}
+            onSelectRoster={handleSelectRoster}
             onDeleteRoster={handleDeleteRoster}
             onRosterSaved={loadData}
             assignments={assignments}
@@ -229,7 +262,7 @@ export default function Sidebar({
                 try {
                   await saveClassRoster(user.uid, updatedRoster);
                   await loadData();
-                  onSelectRoster(updatedRoster);
+                  handleSelectRoster(updatedRoster);
                 } catch (error) {
                   console.error("학급 업데이트 실패:", error);
                 }
