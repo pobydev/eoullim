@@ -24,14 +24,12 @@ import {
 
 interface CommentItemProps {
   comment: Comment;
-  postType?: "notice" | "feedback";
   onCommentUpdated: () => void;
   onCommentDeleted: () => void;
 }
 
 export default function CommentItem({
   comment,
-  postType = "feedback",
   onCommentUpdated,
   onCommentDeleted,
 }: CommentItemProps) {
@@ -162,4 +160,3 @@ export default function CommentItem({
     </>
   );
 }
-

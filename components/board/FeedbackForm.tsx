@@ -43,6 +43,7 @@ export default function FeedbackForm({ feedback }: FeedbackFormProps) {
     if (user) {
       checkAdmin();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const checkAdmin = async () => {
@@ -187,4 +188,3 @@ export default function FeedbackForm({ feedback }: FeedbackFormProps) {
     </div>
   );
 }
-

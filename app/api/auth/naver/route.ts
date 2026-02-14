@@ -7,12 +7,6 @@ export async function POST(request: NextRequest) {
 
     const clientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
     const clientSecret = process.env.NAVER_CLIENT_SECRET;
-    const baseUrl =
-      process.env.NEXT_PUBLIC_APP_URL ||
-      (process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : "http://localhost:3000");
-    const redirectUri = `${baseUrl}/auth/naver/callback`;
 
     if (!clientId || !clientSecret) {
       return NextResponse.json(
@@ -88,10 +82,14 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ customToken });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("네이버 로그인 처리 실패:", error);
+    const message =
+      error instanceof Error
+        ? error.message
+        : "네이버 로그인 처리 중 오류가 발생했습니다.";
     return NextResponse.json(
-      { error: error.message || "네이버 로그인 처리 중 오류가 발생했습니다." },
+      { error: message },
       { status: 500 }
     );
   }

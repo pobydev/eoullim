@@ -2,7 +2,7 @@
 
 import { Feedback } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Calendar, AlertCircle, Lightbulb, MessageSquare, HelpCircle } from "lucide-react";
+import { Eye, Calendar, Lightbulb, MessageSquare, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -77,4 +77,3 @@ export default function FeedbackCard({ feedback }: FeedbackCardProps) {
     </Link>
   );
 }
-

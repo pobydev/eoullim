@@ -6,6 +6,7 @@ import { Notice } from "@/types";
 import { getNotice } from "@/lib/firestore";
 import NoticeForm from "@/components/board/NoticeForm";
 import { Loader2 } from "lucide-react";
+import RequireAdmin from "@/components/RequireAdmin";
 
 export default function EditNoticePage() {
   const params = useParams();
@@ -17,6 +18,7 @@ export default function EditNoticePage() {
     if (noticeId) {
       loadNotice();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [noticeId]);
 
   const loadNotice = async () => {
@@ -31,22 +33,20 @@ export default function EditNoticePage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-sky-500" />
-      </div>
-    );
-  }
-
-  if (!notice) {
-    return (
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <p className="text-center text-gray-500">공지사항을 찾을 수 없습니다.</p>
-      </div>
-    );
-  }
-
-  return <NoticeForm notice={notice} />;
+  return (
+    <RequireAdmin>
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-sky-500" />
+        </div>
+      ) : !notice ? (
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <p className="text-center text-gray-500">공지사항을 찾을 수 없습니다.</p>
+        </div>
+      ) : (
+        <NoticeForm notice={notice} />
+      )}
+    </RequireAdmin>
+  );
 }
 

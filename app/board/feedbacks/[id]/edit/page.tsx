@@ -17,6 +17,7 @@ export default function EditFeedbackPage() {
     if (feedbackId) {
       loadFeedback();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feedbackId]);
 
   const loadFeedback = async () => {
@@ -49,4 +50,3 @@ export default function EditFeedbackPage() {
 
   return <FeedbackForm feedback={feedback} />;
 }
-

@@ -14,14 +14,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { saveClassRoster } from "@/lib/firestore";
 import { ClassRoster, Student } from "@/types";
 import { Trash2, Plus, Clipboard } from "lucide-react";
@@ -155,7 +147,11 @@ export default function EditRosterDialog({
     setStudents(updated);
   };
 
-  const handleUpdateStudent = (id: string, field: keyof Student, value: any) => {
+  const handleUpdateStudent = <K extends keyof Student>(
+    id: string,
+    field: K,
+    value: Student[K]
+  ) => {
     setStudents(
       students.map((s) =>
         s.id === id ? { ...s, [field]: value } : s
@@ -426,4 +422,3 @@ export default function EditRosterDialog({
     </Dialog>
   );
 }
-

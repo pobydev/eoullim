@@ -10,6 +10,13 @@ function KakaoCallbackContent() {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
 
+  const getErrorMessage = (error: unknown): string => {
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return "로그인에 실패했습니다.";
+  };
+
   useEffect(() => {
     const handleCallback = async () => {
       const code = searchParams.get("code");
@@ -48,9 +55,9 @@ function KakaoCallbackContent() {
         } else {
           throw new Error("토큰을 받지 못했습니다.");
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("카카오 로그인 처리 실패:", error);
-        setError(error.message || "로그인에 실패했습니다.");
+        setError(getErrorMessage(error));
         setTimeout(() => router.push("/"), 3000);
       }
     };
@@ -91,4 +98,3 @@ export default function KakaoCallback() {
     </Suspense>
   );
 }
-

@@ -13,8 +13,30 @@ import {
   increment,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "./firebase";
+import type { DocumentData, Query } from "firebase/firestore";
+import { auth, db } from "./firebase";
 import { ClassRoster, Layout, UserProfile, Notice, Feedback, Comment, FeedbackCategory, FeedbackStatus, PostType } from "@/types";
+
+type TimestampedFirestoreData = Record<string, unknown> & {
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+  repliedAt?: Timestamp;
+};
+
+type FirestoreErrorLike = {
+  code?: string;
+  message?: string;
+};
+
+const asTimestampedData = (value: unknown): TimestampedFirestoreData =>
+  value as TimestampedFirestoreData;
+
+const asFirestoreError = (error: unknown): FirestoreErrorLike | null => {
+  if (typeof error !== "object" || error === null) {
+    return null;
+  }
+  return error as FirestoreErrorLike;
+};
 
 if (typeof window !== "undefined" && !db) {
   console.warn(
@@ -25,43 +47,10 @@ if (typeof window !== "undefined" && !db) {
 export async function saveClassRoster(userId: string, roster: ClassRoster) {
   if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const rosterRef = doc(db, `users/${userId}/classRosters`, roster.id);
-  
-  // students 배열에서 undefined 필드 제거
-  const cleanedStudents = roster.students.map((student) => {
-    const cleaned: any = {
-      id: student.id,
-      name: student.name,
-    };
-    if (student.attendanceNumber !== undefined) {
-      cleaned.attendanceNumber = student.attendanceNumber;
-    }
-    if (student.gender !== undefined) {
-      cleaned.gender = student.gender;
-    }
-    return cleaned;
-  });
-  
-  // roster 객체에서 undefined 필드 제거
-  const rosterData: any = {
-    id: roster.id,
-    className: roster.className,
-    students: cleanedStudents,
+  await setDoc(rosterRef, {
+    ...roster,
     createdAt: Timestamp.now(),
-  };
-  
-  // createdAt이 이미 있으면 유지 (업데이트 시)
-  if (roster.createdAt) {
-    rosterData.createdAt = Timestamp.fromDate(roster.createdAt);
-  }
-  
-  // undefined 값을 가진 필드 제거
-  Object.keys(rosterData).forEach((key) => {
-    if (rosterData[key] === undefined) {
-      delete rosterData[key];
-    }
   });
-  
-  await setDoc(rosterRef, rosterData);
 }
 
 export async function getClassRosters(userId: string): Promise<ClassRoster[]> {
@@ -69,7 +58,7 @@ export async function getClassRosters(userId: string): Promise<ClassRoster[]> {
   const q = query(collection(db, `users/${userId}/classRosters`));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((doc) => {
-    const data = doc.data() as Record<string, any>;
+    const data = asTimestampedData(doc.data());
     return {
       id: doc.id,
       ...data,
@@ -103,26 +92,11 @@ export async function saveLayout(userId: string, layout: Layout) {
   if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const layoutRef = doc(db, `users/${userId}/layouts`, layout.id);
   
-  // currentAssignment를 명시적으로 직렬화하여 저장
-  const layoutData: any = {
-    id: layout.id,
-    title: layout.title,
-    classId: layout.classId,
-    config: layout.config,
-    cells: layout.cells,
-    currentAssignment: layout.currentAssignment || [], // 명시적으로 배열로 저장
+  // undefined 값을 가진 필드를 제거하여 Firestore 저장 오류 방지
+  const layoutData: Record<string, unknown> = {
+    ...layout,
     createdAt: Timestamp.now(),
   };
-  
-  // zoneStudentMapping이 있으면 추가
-  if (layout.zoneStudentMapping && layout.zoneStudentMapping.length > 0) {
-    layoutData.zoneStudentMapping = layout.zoneStudentMapping;
-  }
-  
-  // createdAt이 이미 있으면 유지 (업데이트 시)
-  if (layout.createdAt) {
-    layoutData.createdAt = Timestamp.fromDate(layout.createdAt);
-  }
   
   // undefined 값을 가진 필드 제거
   Object.keys(layoutData).forEach((key) => {
@@ -139,11 +113,10 @@ export async function getLayouts(userId: string): Promise<Layout[]> {
   const q = query(collection(db, `users/${userId}/layouts`));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((doc) => {
-    const data = doc.data() as Record<string, any>;
+    const data = asTimestampedData(doc.data());
     return {
       id: doc.id,
       ...data,
-      currentAssignment: data.currentAssignment || [], // 명시적으로 배열로 복원
       createdAt: data.createdAt?.toDate(),
     } as Layout;
   });
@@ -157,12 +130,10 @@ export async function getLayout(
   const layoutRef = doc(db, `users/${userId}/layouts`, layoutId);
   const snapshot = await getDoc(layoutRef);
   if (!snapshot.exists()) return null;
-  const data = snapshot.data();
   return {
     id: snapshot.id,
-    ...data,
-    currentAssignment: data.currentAssignment || [], // 명시적으로 배열로 복원
-    createdAt: data.createdAt?.toDate(),
+    ...snapshot.data(),
+    createdAt: snapshot.data().createdAt?.toDate(),
   } as Layout;
 }
 
@@ -195,7 +166,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
 export async function saveUserProfile(userId: string, profile: UserProfile) {
   if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const userRef = doc(db, `users`, userId);
-  const updateData: any = {
+  const updateData: Record<string, unknown> = {
     updatedAt: Timestamp.now(),
   };
   
@@ -276,7 +247,7 @@ export async function getNotices(): Promise<Notice[]> {
   const q = query(collection(db, "notices"), orderBy("createdAt", "desc"));
   const snapshot = await getDocs(q);
   const notices = snapshot.docs.map((doc) => {
-    const data = doc.data() as Record<string, any>;
+    const data = asTimestampedData(doc.data());
     return {
       id: doc.id,
       ...data,
@@ -311,7 +282,7 @@ export async function getNotice(noticeId: string): Promise<Notice | null> {
 export async function updateNotice(noticeId: string, updates: Partial<Notice>): Promise<void> {
   if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const noticeRef = doc(db, "notices", noticeId);
-  const updateData: any = {
+  const updateData: Record<string, unknown> = {
     ...updates,
     updatedAt: Timestamp.now(),
   };
@@ -362,7 +333,10 @@ export interface GetFeedbacksOptions {
 
 export async function getFeedbacks(options?: GetFeedbacksOptions): Promise<Feedback[]> {
   if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
-  let q: any = query(collection(db, "feedbacks"), orderBy("createdAt", "desc"));
+  let q: Query<DocumentData> = query(
+    collection(db, "feedbacks"),
+    orderBy("createdAt", "desc")
+  );
   
   if (options?.category) {
     q = query(q, where("category", "==", options.category));
@@ -374,7 +348,7 @@ export async function getFeedbacks(options?: GetFeedbacksOptions): Promise<Feedb
   
   const snapshot = await getDocs(q);
   let feedbacks = snapshot.docs.map((doc) => {
-    const data = doc.data() as Record<string, any>;
+    const data = asTimestampedData(doc.data());
     return {
       id: doc.id,
       ...data,
@@ -414,7 +388,7 @@ export async function getFeedback(feedbackId: string): Promise<Feedback | null> 
 export async function updateFeedback(feedbackId: string, updates: Partial<Feedback>): Promise<void> {
   if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
   const feedbackRef = doc(db, "feedbacks", feedbackId);
-  const updateData: any = {
+  const updateData: Record<string, unknown> = {
     ...updates,
     updatedAt: Timestamp.now(),
   };
@@ -450,26 +424,69 @@ export async function incrementFeedbackViewCount(feedbackId: string): Promise<vo
 
 // ==================== 댓글 관련 함수 ====================
 
+function normalizeEmail(email?: string | null): string {
+  return (email ?? "").trim().toLowerCase();
+}
+
+function getAdminEmailSet(): Set<string> {
+  const configuredEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "";
+  return new Set(
+    configuredEmails
+      .split(",")
+      .map((email) => normalizeEmail(email))
+      .filter(Boolean)
+  );
+}
+
+function isConfiguredAdminEmail(email?: string | null): boolean {
+  const normalized = normalizeEmail(email);
+  if (!normalized) {
+    return false;
+  }
+  return getAdminEmailSet().has(normalized);
+}
+
+function toFirestoreActionError(action: string, error: unknown): Error {
+  const firestoreError = asFirestoreError(error);
+  if (firestoreError?.code === "permission-denied") {
+    return new Error(`${action} 권한이 없습니다. 로그인 또는 권한 상태를 확인해주세요.`);
+  }
+  if (
+    firestoreError?.code === "unavailable" ||
+    firestoreError?.code === "deadline-exceeded"
+  ) {
+    return new Error("네트워크 상태를 확인한 뒤 다시 시도해주세요.");
+  }
+  if (firestoreError?.code === "not-found") {
+    return new Error("대상을 찾을 수 없습니다.");
+  }
+  if (error instanceof Error) {
+    return error;
+  }
+  return new Error(`${action} 중 오류가 발생했습니다.`);
+}
+
 export async function createComment(
-  comment: Omit<Comment, "id" | "createdAt" | "updatedAt">,
-  isAdminUser?: boolean
+  comment: Omit<Comment, "id" | "createdAt" | "updatedAt" | "isAdmin">
 ): Promise<string> {
   if (!db) {
     throw new Error("Firestore가 초기화되지 않았습니다.");
   }
   
   try {
+    const adminUser = await isAdmin(comment.authorId, comment.authorEmail);
     const commentRef = doc(collection(db, "comments"));
     const now = Timestamp.now();
     await setDoc(commentRef, {
       ...comment,
-      isAdmin: isAdminUser || false,
+      content: comment.content.trim(),
+      isAdmin: adminUser,
       createdAt: now,
       updatedAt: now,
     });
     
     // 관리자가 Q&A에 댓글을 달면 자동으로 상태를 "답변 완료"로 변경
-    if (isAdminUser && comment.postType === "feedback") {
+    if (adminUser && comment.postType === "feedback") {
       try {
         await updateFeedback(comment.postId, {
           status: "답변 완료" as FeedbackStatus,
@@ -481,13 +498,9 @@ export async function createComment(
     }
     
     return commentRef.id;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("댓글 생성 오류:", error);
-    // 권한 오류인 경우 더 명확한 메시지 제공
-    if (error?.code === "permission-denied") {
-      throw new Error("댓글 작성 권한이 없습니다. 로그인 상태를 확인해주세요.");
-    }
-    throw error;
+    throw toFirestoreActionError("댓글 작성", error);
   }
 }
 
@@ -503,7 +516,7 @@ export async function getComments(postId: string, postType: PostType): Promise<C
     );
     const snapshot = await getDocs(q);
     const comments = snapshot.docs.map((doc) => {
-      const data = doc.data() as Record<string, any>;
+      const data = asTimestampedData(doc.data());
       return {
         id: doc.id,
         ...data,
@@ -512,9 +525,13 @@ export async function getComments(postId: string, postType: PostType): Promise<C
       } as Comment;
     });
     return comments;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const firestoreError = asFirestoreError(error);
     // 인덱스 오류인 경우, orderBy 없이 조회 후 클라이언트에서 정렬
-    if (error?.code === "failed-precondition" || error?.message?.includes("index")) {
+    if (
+      firestoreError?.code === "failed-precondition" ||
+      firestoreError?.message?.includes("index")
+    ) {
       console.warn("인덱스가 없어 클라이언트에서 정렬합니다:", error);
       const q = query(
         collection(db, "comments"),
@@ -523,7 +540,7 @@ export async function getComments(postId: string, postType: PostType): Promise<C
       );
       const snapshot = await getDocs(q);
       const comments = snapshot.docs.map((doc) => {
-        const data = doc.data() as Record<string, any>;
+        const data = asTimestampedData(doc.data());
         return {
           id: doc.id,
           ...data,
@@ -544,79 +561,94 @@ export async function getComments(postId: string, postType: PostType): Promise<C
 
 export async function updateComment(commentId: string, updates: Partial<Comment>): Promise<void> {
   if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
-  const commentRef = doc(db, "comments", commentId);
-  const updateData: any = {
-    ...updates,
-    updatedAt: Timestamp.now(),
-  };
-  // undefined 값 제거
-  Object.keys(updateData).forEach((key) => {
-    if (updateData[key] === undefined) {
-      delete updateData[key];
-    }
-  });
-  await updateDoc(commentRef, updateData);
+  try {
+    const commentRef = doc(db, "comments", commentId);
+    const updateData: Record<string, unknown> = {
+      ...updates,
+      updatedAt: Timestamp.now(),
+    };
+    // undefined 값 제거
+    Object.keys(updateData).forEach((key) => {
+      if (updateData[key] === undefined) {
+        delete updateData[key];
+      }
+    });
+    await updateDoc(commentRef, updateData);
+  } catch (error: unknown) {
+    console.error("댓글 수정 오류:", error);
+    throw toFirestoreActionError("댓글 수정", error);
+  }
 }
 
 export async function deleteComment(commentId: string): Promise<void> {
   if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
-  // 삭제 전에 댓글 정보 가져오기
-  const commentRef = doc(db, "comments", commentId);
-  const commentSnap = await getDoc(commentRef);
-  
-  if (!commentSnap.exists()) {
-    throw new Error("댓글을 찾을 수 없습니다.");
-  }
-  
-  const commentData = commentSnap.data() as Comment;
-  const wasAdminComment = commentData.isAdmin;
-  const postId = commentData.postId;
-  const postType = commentData.postType;
-  
-  // 댓글 삭제
-  await deleteDoc(commentRef);
-  
-  // 관리자 댓글이 삭제되었고, Q&A 게시글인 경우 상태 확인
-  if (wasAdminComment && postType === "feedback") {
-    try {
-      // 남은 댓글 중 관리자 댓글이 있는지 확인
-      const remainingComments = await getComments(postId, postType);
-      const hasAdminComment = remainingComments.some(c => c.isAdmin);
-      
-      // 관리자 댓글이 없으면 상태를 "답변 대기"로 변경
-      if (!hasAdminComment) {
-        await updateFeedback(postId, {
-          status: "답변 대기" as FeedbackStatus,
-        });
-      }
-    } catch (error) {
-      console.error("Q&A 상태 업데이트 실패:", error);
-      // 댓글은 삭제되었으므로 에러를 던지지 않음
+  try {
+    // 삭제 전에 댓글 정보 가져오기
+    const commentRef = doc(db, "comments", commentId);
+    const commentSnap = await getDoc(commentRef);
+    
+    if (!commentSnap.exists()) {
+      throw new Error("댓글을 찾을 수 없습니다.");
     }
+    
+    const commentData = commentSnap.data() as Comment;
+    const wasAdminComment = commentData.isAdmin;
+    const postId = commentData.postId;
+    const postType = commentData.postType;
+    
+    // 댓글 삭제
+    await deleteDoc(commentRef);
+    
+    // 관리자 댓글이 삭제되었고, Q&A 게시글인 경우 상태 확인
+    if (wasAdminComment && postType === "feedback") {
+      try {
+        // 남은 댓글 중 관리자 댓글이 있는지 확인
+        const remainingComments = await getComments(postId, postType);
+        const hasAdminComment = remainingComments.some(c => c.isAdmin);
+        
+        // 관리자 댓글이 없으면 상태를 "답변 대기"로 변경
+        if (!hasAdminComment) {
+          await updateFeedback(postId, {
+            status: "답변 대기" as FeedbackStatus,
+          });
+        }
+      } catch (error) {
+        console.error("Q&A 상태 업데이트 실패:", error);
+        // 댓글은 삭제되었으므로 에러를 던지지 않음
+      }
+    }
+  } catch (error: unknown) {
+    console.error("댓글 삭제 오류:", error);
+    throw toFirestoreActionError("댓글 삭제", error);
   }
 }
 
 // ==================== 관리자 체크 함수 ====================
 
 export async function isAdmin(userId: string, userEmail?: string): Promise<boolean> {
-  // 초기 구현: 환경 변수에서 관리자 이메일 목록 확인
-  // 나중에 Custom Claims로 확장 가능하도록 설계
-  if (!userEmail) {
-    console.log("[isAdmin] userEmail이 없습니다.");
+  if (!userId) {
     return false;
   }
-  
-  const adminEmailsString = process.env.NEXT_PUBLIC_ADMIN_EMAILS;
-  console.log("[isAdmin] 환경 변수:", adminEmailsString);
-  console.log("[isAdmin] 사용자 이메일:", userEmail);
-  
-  const adminEmails = adminEmailsString?.split(",").map((e) => e.trim().toLowerCase()) || [];
-  const normalizedUserEmail = userEmail.toLowerCase().trim();
-  
-  console.log("[isAdmin] 관리자 이메일 목록:", adminEmails);
-  console.log("[isAdmin] 정규화된 사용자 이메일:", normalizedUserEmail);
-  console.log("[isAdmin] 관리자 여부:", adminEmails.includes(normalizedUserEmail));
-  
-  return adminEmails.includes(normalizedUserEmail);
-}
 
+  if (auth?.currentUser?.uid !== userId) {
+    return isConfiguredAdminEmail(userEmail);
+  }
+
+  try {
+    const tokenResult = await auth.currentUser.getIdTokenResult();
+    const claimAdmin = tokenResult.claims?.admin === true;
+    const claimEmail =
+      typeof tokenResult.claims?.email === "string"
+        ? tokenResult.claims.email
+        : undefined;
+
+    return (
+      claimAdmin ||
+      isConfiguredAdminEmail(claimEmail) ||
+      isConfiguredAdminEmail(userEmail)
+    );
+  } catch (error) {
+    console.warn("관리자 권한 확인 실패:", error);
+    return isConfiguredAdminEmail(userEmail);
+  }
+}

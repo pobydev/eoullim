@@ -18,6 +18,7 @@ export default function BoardPage() {
     if (user) {
       checkAdmin();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const checkAdmin = async () => {
@@ -78,4 +79,3 @@ export default function BoardPage() {
     </div>
   );
 }
-

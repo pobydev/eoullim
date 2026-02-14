@@ -51,7 +51,6 @@ export function getImageUrl(imagePath: string): string {
   if (!storage) {
     throw new Error("Firebase Storage가 초기화되지 않았습니다.");
   }
-  const storageRef = ref(storage, imagePath);
   // 실제로는 getDownloadURL을 사용해야 하지만, 경로만 반환하는 헬퍼 함수
   return imagePath;
 }

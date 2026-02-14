@@ -1,9 +1,9 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ClassRoster, Layout, SeatAssignment, UserProfile } from "@/types";
 import {
@@ -16,8 +16,7 @@ import {
 } from "@/lib/firestore";
 import RosterManager from "./RosterManager";
 import LayoutList from "./LayoutList";
-import { LogOut, Settings, HelpCircle, MessageSquare } from "lucide-react";
-import Link from "next/link";
+import { LogOut, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ProfileSettingsDialog from "./ProfileSettingsDialog";
 
@@ -46,7 +45,6 @@ export default function Sidebar({
   const router = useRouter();
   const [rosters, setRosters] = useState<ClassRoster[]>([]);
   const [layouts, setLayouts] = useState<Layout[]>([]);
-  const [loading, setLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -58,6 +56,7 @@ export default function Sidebar({
       // 사용자가 변경되면 이미지 에러 상태 초기화
       setImageError(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const loadUserProfile = async () => {
@@ -65,7 +64,9 @@ export default function Sidebar({
     try {
       const profile = await getUserProfile(user.uid);
       setUserProfile(profile);
+      console.log("프로필 로드됨:", profile);
     } catch (error) {
+      console.error("프로필 로드 실패:", error);
       setUserProfile(null);
     }
   };
@@ -75,6 +76,7 @@ export default function Sidebar({
     if (user && layoutRefreshKey !== undefined && layoutRefreshKey > 0) {
       loadData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [layoutRefreshKey]);
 
   const loadData = async () => {
@@ -88,26 +90,8 @@ export default function Sidebar({
       setLayouts(layoutData);
     } catch (error) {
       console.error("데이터 로드 실패:", error);
-    } finally {
-      setLoading(false);
     }
   };
-
-  // 학급이 선택되어 있고 레이아웃이 로드되었을 때, 가장 최근 레이아웃 자동 선택
-  useEffect(() => {
-    if (selectedRoster && layouts.length > 0 && !selectedLayout) {
-      const classLayouts = layouts.filter((layout) => layout.classId === selectedRoster.id);
-      if (classLayouts.length > 0) {
-        // createdAt 기준으로 정렬하여 가장 최근 것 선택
-        const sortedLayouts = [...classLayouts].sort((a, b) => {
-          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          return dateB - dateA; // 최신순
-        });
-        onSelectLayout(sortedLayouts[0]);
-      }
-    }
-  }, [selectedRoster, layouts, selectedLayout, onSelectLayout]);
 
   const handleDeleteRoster = async (rosterId: string) => {
     if (!user) return;
@@ -136,39 +120,15 @@ export default function Sidebar({
     }
   };
 
-  // 학급 선택 시 가장 최근 레이아웃 자동 선택
-  const handleSelectRoster = (roster: ClassRoster | null) => {
-    onSelectRoster(roster);
-    
-    if (roster) {
-      // 해당 학급의 레이아웃 중 가장 최근 것을 찾기
-      const classLayouts = layouts.filter((layout) => layout.classId === roster.id);
-      if (classLayouts.length > 0) {
-        // createdAt 기준으로 정렬하여 가장 최근 것 선택
-        const sortedLayouts = [...classLayouts].sort((a, b) => {
-          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          return dateB - dateA; // 최신순
-        });
-        onSelectLayout(sortedLayouts[0]);
-      } else {
-        // 해당 학급의 레이아웃이 없으면 레이아웃 선택 해제
-        onSelectLayout(null);
-      }
-    } else {
-      // 학급 선택 해제 시 레이아웃도 해제
-      onSelectLayout(null);
-    }
-  };
-
   return (
-    <div className="w-80 h-screen bg-white border-r border-gray-200 flex flex-col shadow-sm overflow-hidden">
+    <div className="w-80 bg-white border-r border-gray-200 flex flex-col shadow-sm">
       {/* 로고 섹션 */}
       <div 
         className="p-4 border-b border-gray-200 shadow-[0_2px_4px_rgba(0,0,0,0.08)] bg-gradient-to-br from-sky-50 via-white to-blue-50 cursor-pointer hover:bg-gradient-to-br hover:from-sky-100 hover:via-white hover:to-blue-100 transition-colors"
         onClick={() => {
-          // 데이터만 새로고침 (현재 선택 상태 유지)
-          loadData();
+          // 선택된 학급과 레이아웃 초기화 (새로고침 효과)
+          onSelectRoster(null);
+          onSelectLayout(null);
           router.refresh();
         }}
       >
@@ -178,8 +138,8 @@ export default function Sidebar({
             className="text-sm text-gray-600 text-center leading-relaxed flex flex-col"
             style={{ fontFamily: '"학교안심 받아쓰기체", sans-serif' }}
           >
-            <span>"자리에서 시작되는</span>
-            <span>우리 반의 새로운 이야기"</span>
+            <span>&quot;자리에서 시작되는</span>
+            <span>우리 반의 새로운 이야기&quot;</span>
           </p>
         </div>
       </div>
@@ -252,7 +212,7 @@ export default function Sidebar({
           <RosterManager
             rosters={rosters}
             selectedRoster={selectedRoster}
-            onSelectRoster={handleSelectRoster}
+            onSelectRoster={onSelectRoster}
             onDeleteRoster={handleDeleteRoster}
             onRosterSaved={loadData}
             assignments={assignments}
@@ -262,7 +222,7 @@ export default function Sidebar({
                 try {
                   await saveClassRoster(user.uid, updatedRoster);
                   await loadData();
-                  handleSelectRoster(updatedRoster);
+                  onSelectRoster(updatedRoster);
                 } catch (error) {
                   console.error("학급 업데이트 실패:", error);
                 }
@@ -285,24 +245,6 @@ export default function Sidebar({
         </TabsContent>
       </Tabs>
 
-      {/* 네비게이션 섹션 - 게시판 및 도움말 */}
-      <div className="p-4 border-t border-gray-200 bg-gradient-to-br from-sky-50 via-white to-blue-50 flex-shrink-0">
-        <div className="flex gap-2">
-          <Link href="/board" className="flex-1">
-            <Button variant="outline" className="w-full justify-center" size="sm">
-              <MessageSquare className="mr-2 h-4 w-4" />
-              게시판
-            </Button>
-          </Link>
-          <Link href="/help" className="flex-1">
-            <Button variant="outline" className="w-full justify-center" size="sm">
-              <HelpCircle className="mr-2 h-4 w-4" />
-              도움말
-            </Button>
-          </Link>
-        </div>
-      </div>
-
       {user && (
         <ProfileSettingsDialog
           open={isProfileDialogOpen}
@@ -315,4 +257,3 @@ export default function Sidebar({
     </div>
   );
 }
-
