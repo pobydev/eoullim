@@ -112,10 +112,14 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ customToken });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("카카오 로그인 처리 실패:", error);
+    const message =
+      error instanceof Error
+        ? error.message
+        : "카카오 로그인 처리 중 오류가 발생했습니다.";
     return NextResponse.json(
-      { error: error.message || "카카오 로그인 처리 중 오류가 발생했습니다." },
+      { error: message },
       { status: 500 }
     );
   }

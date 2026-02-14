@@ -16,6 +16,7 @@ export default function NoticesPage() {
     if (user) {
       checkAdmin();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const checkAdmin = async () => {
@@ -57,4 +58,3 @@ export default function NoticesPage() {
     </div>
   );
 }
-

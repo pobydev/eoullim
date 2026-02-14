@@ -25,6 +25,24 @@ service cloud.firestore {
     function isAuthor(authorId) {
       return isAuthenticated() && request.auth.uid == authorId;
     }
+
+    function isValidPostType(postType) {
+      return postType in ["notice", "feedback"];
+    }
+
+    function hasCommentCreateFields() {
+      return request.resource.data.keys().hasOnly([
+        "postId",
+        "postType",
+        "authorId",
+        "authorName",
+        "authorEmail",
+        "content",
+        "isAdmin",
+        "createdAt",
+        "updatedAt"
+      ]);
+    }
     
     // ==================== 공지사항 (notices) ====================
     match /notices/{noticeId} {
@@ -48,7 +66,9 @@ service cloud.firestore {
       
       // 생성: 모든 인증 사용자
       allow create: if isAuthenticated() && 
-                       request.resource.data.authorId == request.auth.uid;
+                       request.resource.data.authorId == request.auth.uid &&
+                       request.auth.token.email != null &&
+                       request.resource.data.authorEmail == request.auth.token.email;
       
       // 수정: 작성자 또는 admin
       allow update: if isAuthenticated() && 
@@ -66,11 +86,33 @@ service cloud.firestore {
       
       // 생성: 모든 인증 사용자
       allow create: if isAuthenticated() && 
-                       request.resource.data.authorId == request.auth.uid;
+                       hasCommentCreateFields() &&
+                       request.resource.data.authorId == request.auth.uid &&
+                       request.auth.token.email != null &&
+                       request.resource.data.authorEmail == request.auth.token.email &&
+                       isValidPostType(request.resource.data.postType) &&
+                       request.resource.data.content is string &&
+                       request.resource.data.content.size() > 0 &&
+                       request.resource.data.createdAt is timestamp &&
+                       request.resource.data.updatedAt is timestamp &&
+                       request.resource.data.isAdmin == isAdmin();
       
       // 수정: 작성자만
       allow update: if isAuthenticated() && 
-                       isAuthor(resource.data.authorId);
+                       isAuthor(resource.data.authorId) &&
+                       request.resource.data.diff(resource.data).changedKeys().hasOnly([
+                         "content",
+                         "updatedAt"
+                       ]) &&
+                       request.resource.data.content is string &&
+                       request.resource.data.content.size() > 0 &&
+                       request.resource.data.updatedAt is timestamp &&
+                       request.resource.data.authorId == resource.data.authorId &&
+                       request.resource.data.authorName == resource.data.authorName &&
+                       request.resource.data.authorEmail == resource.data.authorEmail &&
+                       request.resource.data.postId == resource.data.postId &&
+                       request.resource.data.postType == resource.data.postType &&
+                       request.resource.data.isAdmin == resource.data.isAdmin;
       
       // 삭제: 작성자만
       allow delete: if isAuthenticated() && 
@@ -113,4 +155,3 @@ service cloud.firestore {
     // }
   }
 }
-

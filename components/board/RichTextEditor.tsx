@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -65,6 +64,9 @@ export default function RichTextEditor({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
 
+  const toErrorMessage = (error: unknown) =>
+    error instanceof Error ? error.message : "Image upload failed.";
+
   useEffect(() => {
     if (editorRef.current && value !== editorRef.current.innerHTML) {
       editorRef.current.innerHTML = value;
@@ -112,9 +114,9 @@ export default function RichTextEditor({
       }
       
       handleInput();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("이미지 업로드 실패:", error);
-      alert(error.message || "이미지 업로드에 실패했습니다.");
+      alert(toErrorMessage(error));
     } finally {
       setIsUploading(false);
     }
@@ -196,7 +198,7 @@ export default function RichTextEditor({
                   span.style.fontSize = size;
                   try {
                     range.surroundContents(span);
-                  } catch (e) {
+                  } catch {
                     // 이미 감싸져 있는 경우
                     const container = range.commonAncestorContainer;
                     if (container.nodeType === Node.TEXT_NODE) {
@@ -369,4 +371,3 @@ export default function RichTextEditor({
     </div>
   );
 }
-

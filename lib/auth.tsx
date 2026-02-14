@@ -6,7 +6,6 @@ import {
   onAuthStateChanged,
   signInWithPopup,
   GoogleAuthProvider,
-  signInWithCustomToken,
   signOut,
   deleteUser,
 } from "firebase/auth";

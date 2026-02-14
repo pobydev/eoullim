@@ -5,7 +5,7 @@ import { Feedback } from "@/types";
 import { getFeedback, incrementFeedbackViewCount, deleteFeedback, isAdmin } from "@/lib/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, Calendar, ArrowLeft, Edit, Trash2, AlertCircle, Lightbulb, MessageSquare, HelpCircle } from "lucide-react";
+import { Eye, Calendar, ArrowLeft, Edit, Trash2, Lightbulb, MessageSquare, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -55,12 +55,14 @@ export default function FeedbackDetail({ feedbackId }: FeedbackDetailProps) {
     if (feedbackId) {
       loadFeedback();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feedbackId]);
 
   useEffect(() => {
     if (user) {
       checkAdmin();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const checkAdmin = async () => {
@@ -242,4 +244,3 @@ export default function FeedbackDetail({ feedbackId }: FeedbackDetailProps) {
     </div>
   );
 }
-

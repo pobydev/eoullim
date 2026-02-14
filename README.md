@@ -24,7 +24,10 @@ pnpm install
 ### 2. Firebase 설정
 
 1. Firebase 콘솔에서 새 프로젝트를 생성합니다.
-2. Authentication에서 Google 로그인을 활성화합니다.
+2. Authentication에서 로그인 제공자를 활성화합니다.
+   - Google
+   - Naver (선택)
+   - Kakao (선택)
 3. Firestore Database를 생성합니다.
 4. Firebase Storage를 활성화합니다.
 5. `.env.local` 파일을 생성하고 Firebase 설정 값을 입력합니다:
@@ -36,13 +39,25 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id_here
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket_here
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id_here
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id_here
+NEXT_PUBLIC_ADMIN_EMAILS=admin1@example.com,admin2@example.com
+
+# 선택: 네이버 로그인
+NEXT_PUBLIC_NAVER_CLIENT_ID=your_naver_client_id
+NAVER_CLIENT_SECRET=your_naver_client_secret
+
+# 선택: 카카오 로그인
+NEXT_PUBLIC_KAKAO_CLIENT_ID=your_kakao_client_id
+KAKAO_CLIENT_SECRET=your_kakao_client_secret
+
+# 운영 URL (OAuth callback 생성에 사용)
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 6. **Firestore 보안 규칙 설정**:
 
    - Firebase Console > Firestore Database > Rules로 이동
    - 프로젝트 루트의 `firestore.rules` 파일 내용을 복사하여 붙여넣기
-   - **중요**: `isAdmin()` 함수 내의 admin 이메일 목록을 실제 관리자 이메일로 변경해야 합니다
+   - **중요**: `isAdmin()` 함수 내의 admin 이메일 목록과 `NEXT_PUBLIC_ADMIN_EMAILS` 값을 동일하게 맞춰야 합니다
    - 규칙을 게시합니다
 
 7. **Firebase Storage 보안 규칙 설정**:
@@ -71,7 +86,7 @@ pnpm dev
 
 ## 주요 기능
 
-- ✅ Google 로그인 인증
+- ✅ Google / Naver / Kakao 로그인 인증
 - ✅ 반별 명단 관리 (추가/불러오기/저장)
 - ✅ 커스텀 그리드 설정 (기본형: 최대 7x7, 분단형: 최대 8행)
 - ✅ 좌석 활성화/비활성화
@@ -82,6 +97,14 @@ pnpm dev
 - ✅ 배치 저장 및 불러오기
 - ✅ 게시판 시스템 (공지사항, 피드백, 댓글)
 - ✅ 마크다운 에디터 및 이미지 업로드
+
+## 품질 검사
+
+```bash
+pnpm lint
+pnpm typecheck
+pnpm build
+```
 
 ## 프로젝트 구조
 

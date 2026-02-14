@@ -19,6 +19,7 @@ export default function FeedbackList() {
 
   useEffect(() => {
     loadFeedbacks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category, status]);
 
   const loadFeedbacks = async () => {
@@ -110,4 +111,3 @@ export default function FeedbackList() {
     </div>
   );
 }
-

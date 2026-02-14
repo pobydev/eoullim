@@ -1,4 +1,6 @@
 "use client";
+/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable @next/next/no-img-element */
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,8 +23,6 @@ import {
   Maximize2,
   RotateCcw,
   MousePointer,
-  CheckCircle2,
-  Circle,
   HelpCircle,
   BookOpen,
   MessageCircle,

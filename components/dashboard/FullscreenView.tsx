@@ -17,6 +17,64 @@ interface FullscreenViewProps {
   onClose: () => void;
 }
 
+type FullscreenCapableElement = HTMLElement & {
+  webkitRequestFullscreen?: () => Promise<void> | void;
+  mozRequestFullScreen?: () => Promise<void> | void;
+  msRequestFullscreen?: () => Promise<void> | void;
+};
+
+type FullscreenCapableDocument = Document & {
+  webkitFullscreenElement?: Element | null;
+  mozFullScreenElement?: Element | null;
+  msFullscreenElement?: Element | null;
+  webkitExitFullscreen?: () => Promise<void> | void;
+  mozCancelFullScreen?: () => Promise<void> | void;
+  msExitFullscreen?: () => Promise<void> | void;
+};
+
+const getFullscreenElement = (doc: FullscreenCapableDocument) =>
+  doc.fullscreenElement ??
+  doc.webkitFullscreenElement ??
+  doc.mozFullScreenElement ??
+  doc.msFullscreenElement ??
+  null;
+
+const requestFullscreenSafe = async (element: FullscreenCapableElement) => {
+  if (element.requestFullscreen) {
+    await element.requestFullscreen();
+    return;
+  }
+  if (element.webkitRequestFullscreen) {
+    await Promise.resolve(element.webkitRequestFullscreen());
+    return;
+  }
+  if (element.mozRequestFullScreen) {
+    await Promise.resolve(element.mozRequestFullScreen());
+    return;
+  }
+  if (element.msRequestFullscreen) {
+    await Promise.resolve(element.msRequestFullscreen());
+  }
+};
+
+const exitFullscreenSafe = async (doc: FullscreenCapableDocument) => {
+  if (doc.exitFullscreen) {
+    await doc.exitFullscreen().catch(() => {});
+    return;
+  }
+  if (doc.webkitExitFullscreen) {
+    await Promise.resolve(doc.webkitExitFullscreen());
+    return;
+  }
+  if (doc.mozCancelFullScreen) {
+    await Promise.resolve(doc.mozCancelFullScreen());
+    return;
+  }
+  if (doc.msExitFullscreen) {
+    await Promise.resolve(doc.msExitFullscreen());
+  }
+};
+
 export default function FullscreenView({
   rows,
   cols,
@@ -51,8 +109,8 @@ export default function FullscreenView({
         const scaleX = containerWidth / gridWidth;
         const scaleY = containerHeight / gridHeight;
         
-        // 비율을 유지하면서 화면에 맞게 조정 (최소 0.5, 최대 5)
-        const newScale = Math.max(0.5, Math.min(scaleX, scaleY, 5));
+        // 비율을 유지하면서 화면에 맞게 조정 (최소 0.5, 최대 3)
+        const newScale = Math.max(0.5, Math.min(scaleX, scaleY, 3));
         setScale(newScale);
       }, 100);
     };
@@ -77,15 +135,7 @@ export default function FullscreenView({
       if (!element) return;
 
       try {
-        if (element.requestFullscreen) {
-          await element.requestFullscreen();
-        } else if ((element as any).webkitRequestFullscreen) {
-          await (element as any).webkitRequestFullscreen();
-        } else if ((element as any).mozRequestFullScreen) {
-          await (element as any).mozRequestFullScreen();
-        } else if ((element as any).msRequestFullscreen) {
-          await (element as any).msRequestFullscreen();
-        }
+        await requestFullscreenSafe(element as FullscreenCapableElement);
       } catch (error) {
         console.log("전체화면 모드 진입 실패:", error);
       }
@@ -95,11 +145,9 @@ export default function FullscreenView({
 
     // 전체화면 종료 이벤트 리스너 (ESC 키 등으로 종료될 때)
     const handleFullscreenChange = () => {
-      const isFullscreen = 
-        document.fullscreenElement ||
-        (document as any).webkitFullscreenElement ||
-        (document as any).mozFullScreenElement ||
-        (document as any).msFullscreenElement;
+      const isFullscreen = getFullscreenElement(
+        document as FullscreenCapableDocument
+      );
 
       if (!isFullscreen) {
         // 전체화면이 해제되면 자동으로 닫기
@@ -120,24 +168,21 @@ export default function FullscreenView({
       document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
 
       // 전체화면 모드 종료 (전체화면 상태 확인 후)
-      const isFullscreen = 
-        document.fullscreenElement ||
-        (document as any).webkitFullscreenElement ||
-        (document as any).mozFullScreenElement ||
-        (document as any).msFullscreenElement;
+      const fullscreenDocument = document as FullscreenCapableDocument;
+      const isFullscreen = getFullscreenElement(fullscreenDocument);
 
       if (isFullscreen) {
         try {
           if (document.exitFullscreen) {
             document.exitFullscreen().catch(() => {});
-          } else if ((document as any).webkitExitFullscreen) {
-            (document as any).webkitExitFullscreen();
-          } else if ((document as any).mozCancelFullScreen) {
-            (document as any).mozCancelFullScreen();
-          } else if ((document as any).msExitFullscreen) {
-            (document as any).msExitFullscreen();
+          } else if ((document as FullscreenCapableDocument).webkitExitFullscreen) {
+            (document as FullscreenCapableDocument).webkitExitFullscreen?.();
+          } else if ((document as FullscreenCapableDocument).mozCancelFullScreen) {
+            (document as FullscreenCapableDocument).mozCancelFullScreen?.();
+          } else if ((document as FullscreenCapableDocument).msExitFullscreen) {
+            (document as FullscreenCapableDocument).msExitFullscreen?.();
           }
-        } catch (error) {
+        } catch {
           // 전체화면 종료 실패는 무시
         }
       }
@@ -164,22 +209,11 @@ export default function FullscreenView({
         <Button 
           onClick={() => {
             // 전체화면 모드 종료
-            const isFullscreen = 
-              document.fullscreenElement ||
-              (document as any).webkitFullscreenElement ||
-              (document as any).mozFullScreenElement ||
-              (document as any).msFullscreenElement;
+            const fullscreenDocument = document as FullscreenCapableDocument;
+            const isFullscreen = getFullscreenElement(fullscreenDocument);
 
             if (isFullscreen) {
-              if (document.exitFullscreen) {
-                document.exitFullscreen().catch(() => {});
-              } else if ((document as any).webkitExitFullscreen) {
-                (document as any).webkitExitFullscreen();
-              } else if ((document as any).mozCancelFullScreen) {
-                (document as any).mozCancelFullScreen();
-              } else if ((document as any).msExitFullscreen) {
-                (document as any).msExitFullscreen();
-              }
+              void exitFullscreenSafe(fullscreenDocument);
             }
             onClose();
           }} 
@@ -228,4 +262,3 @@ export default function FullscreenView({
     </div>
   );
 }
-

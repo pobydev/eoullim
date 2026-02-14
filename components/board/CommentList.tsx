@@ -19,8 +19,20 @@ export default function CommentList({ postId, postType, onCommentAdded, onCommen
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const isIndexError = (error: unknown): boolean => {
+    if (!(error instanceof Error)) {
+      return false;
+    }
+    const firestoreLikeError = error as Error & { code?: string };
+    return (
+      firestoreLikeError.code === "failed-precondition" ||
+      error.message.includes("index")
+    );
+  };
+
   useEffect(() => {
     loadComments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postId, postType]);
 
   const loadComments = async () => {
@@ -28,10 +40,10 @@ export default function CommentList({ postId, postType, onCommentAdded, onCommen
       setLoading(true);
       const data = await getComments(postId, postType);
       setComments(data);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("댓글 로드 실패:", error);
       // 인덱스 오류인 경우 사용자에게 알림
-      if (error?.code === "failed-precondition" || error?.message?.includes("index")) {
+      if (isIndexError(error)) {
         console.warn("Firestore 인덱스가 필요합니다. Firebase Console에서 인덱스를 생성해주세요.");
       }
       setComments([]);
@@ -69,7 +81,6 @@ export default function CommentList({ postId, postType, onCommentAdded, onCommen
               <CommentItem
                 key={comment.id}
                 comment={comment}
-                postType={postType}
                 onCommentUpdated={loadComments}
                 onCommentDeleted={() => {
                   loadComments();
@@ -85,4 +96,3 @@ export default function CommentList({ postId, postType, onCommentAdded, onCommen
     </Card>
   );
 }
-

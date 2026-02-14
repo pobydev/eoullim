@@ -54,6 +54,7 @@ export default function ProfileSettingsDialog({
     if (open && userId) {
       loadProfile();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, userId]);
 
   const loadProfile = async () => {
@@ -203,4 +204,3 @@ export default function ProfileSettingsDialog({
     </Dialog>
   );
 }
-

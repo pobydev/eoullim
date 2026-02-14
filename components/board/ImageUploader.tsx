@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { uploadImage } from "@/lib/storage";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Upload, X, Loader2 } from "lucide-react";
+import { Upload, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ImageUploaderProps {
@@ -20,6 +20,11 @@ export default function ImageUploader({
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const toErrorMessage = (error: unknown) =>
+    error instanceof Error
+      ? error.message
+      : "?대?吏 ?낅줈?쒖뿉 ?ㅽ뙣?덉뒿?덈떎.";
 
   const handleFile = async (file: File) => {
     if (!user) {
@@ -42,9 +47,9 @@ export default function ImageUploader({
       setUploading(true);
       const url = await uploadImage(file, user.uid);
       onImageUploaded(url);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("이미지 업로드 실패:", error);
-      alert(error.message || "이미지 업로드에 실패했습니다.");
+      alert(toErrorMessage(error));
     } finally {
       setUploading(false);
     }

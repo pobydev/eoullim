@@ -41,12 +41,14 @@ export default function NoticeDetail({ noticeId }: NoticeDetailProps) {
     if (noticeId) {
       loadNotice();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [noticeId]);
 
   useEffect(() => {
     if (user) {
       checkAdmin();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const checkAdmin = async () => {
@@ -203,4 +205,3 @@ export default function NoticeDetail({ noticeId }: NoticeDetailProps) {
     </div>
   );
 }
-

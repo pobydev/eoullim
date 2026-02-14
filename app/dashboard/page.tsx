@@ -26,7 +26,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/");
+      router.replace("/");
     }
   }, [user, loading, router]);
 
@@ -44,7 +44,6 @@ export default function DashboardPage() {
 
   return <DashboardContent />;
 }
-
 
 
 

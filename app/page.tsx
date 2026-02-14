@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/firebase";
-import { Monitor, Smartphone, Users, Layout, Printer, Sparkles } from "lucide-react";
+import { Smartphone, Users, Layout, Printer, Sparkles } from "lucide-react";
 
 export default function Home() {
   const { user, loading, signInWithGoogle, signInWithNaver, signInWithKakao } = useAuth();
@@ -22,7 +23,9 @@ export default function Home() {
 
     // 모바일 감지
     const checkMobile = () => {
-      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+      const windowWithOpera = window as Window & { opera?: string };
+      const userAgent =
+        navigator.userAgent || navigator.vendor || windowWithOpera.opera || "";
       const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
       const isSmallScreen = window.innerWidth < 768;
       setIsMobile(isMobileDevice || isSmallScreen);
@@ -58,8 +61,8 @@ export default function Home() {
                 className="text-3xl text-gray-700 font-medium leading-relaxed flex flex-col"
                 style={{ fontFamily: '"학교안심 받아쓰기체", sans-serif' }}
               >
-                <span>"자리에서 시작되는</span>
-                <span>우리 반의 새로운 이야기"</span>
+                <span>&quot;자리에서 시작되는</span>
+                <span>우리 반의 새로운 이야기&quot;</span>
               </p>
             </div>
 
