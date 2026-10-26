@@ -6,6 +6,7 @@ import Sidebar from "./Sidebar";
 import MainWorkspace from "./MainWorkspace";
 import { ClassRoster, Layout, SeatAssignment } from "@/types";
 import { saveClassRoster } from "@/lib/firestore";
+import RetirementNotice from "@/components/retirement/RetirementNotice";
 
 export default function DashboardContent() {
   const { user, logout } = useAuth();
@@ -28,28 +29,31 @@ export default function DashboardContent() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar
-        selectedRoster={selectedRoster}
-        onSelectRoster={setSelectedRoster}
-        selectedLayout={selectedLayout}
-        onSelectLayout={setSelectedLayout}
-        onLogout={logout}
-        assignments={assignments}
-        layoutRefreshKey={layoutRefreshKey}
-        isAnimating={isAnimating}
-      />
-      <MainWorkspace
-        selectedRoster={selectedRoster}
-        selectedLayout={selectedLayout}
-        onSelectLayout={setSelectedLayout}
-        onRosterUpdate={handleRosterUpdate}
-        onSelectRoster={setSelectedRoster}
-        assignments={assignments}
-        onAssignmentsChange={setAssignments}
-        onLayoutSaved={() => setLayoutRefreshKey((prev) => prev + 1)}
-        onAnimatingChange={setIsAnimating}
-      />
+    <div className="flex h-screen flex-col bg-gray-50">
+      <RetirementNotice variant="dashboard" />
+      <div className="flex min-h-0 flex-1">
+        <Sidebar
+          selectedRoster={selectedRoster}
+          onSelectRoster={setSelectedRoster}
+          selectedLayout={selectedLayout}
+          onSelectLayout={setSelectedLayout}
+          onLogout={logout}
+          assignments={assignments}
+          layoutRefreshKey={layoutRefreshKey}
+          isAnimating={isAnimating}
+        />
+        <MainWorkspace
+          selectedRoster={selectedRoster}
+          selectedLayout={selectedLayout}
+          onSelectLayout={setSelectedLayout}
+          onRosterUpdate={handleRosterUpdate}
+          onSelectRoster={setSelectedRoster}
+          assignments={assignments}
+          onAssignmentsChange={setAssignments}
+          onLayoutSaved={() => setLayoutRefreshKey((prev) => prev + 1)}
+          onAnimatingChange={setIsAnimating}
+        />
+      </div>
     </div>
   );
 }

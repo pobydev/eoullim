@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/firebase";
 import { Smartphone, Users, Layout, Printer, Sparkles } from "lucide-react";
+import RetirementNotice from "@/components/retirement/RetirementNotice";
 
 export default function Home() {
   const { user, loading, signInWithGoogle, signInWithNaver, signInWithKakao } = useAuth();
@@ -45,7 +46,8 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-sky-200 via-sky-50 to-blue-200" data-page="login">
+    <div className="flex flex-col items-center justify-center gap-4 py-8 min-h-screen bg-gradient-to-br from-sky-200 via-sky-50 to-blue-200" data-page="login">
+      <RetirementNotice variant="landing" />
       <Card className="w-full max-w-2xl mx-auto shadow-xl rounded-3xl bg-white/90 backdrop-blur-sm border border-sky-100/50">
         <CardContent className="p-8">
           <div className="text-center space-y-6">
