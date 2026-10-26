@@ -32,6 +32,7 @@ import {
   Home,
 } from "lucide-react";
 import Link from "next/link";
+import RetirementNotice from "@/components/retirement/RetirementNotice";
 
 export default function HelpPage() {
   return (
@@ -62,6 +63,11 @@ export default function HelpPage() {
 
       {/* 메인 콘텐츠 */}
       <main className="max-w-4xl mx-auto px-6 py-8">
+        {/* 웹 서비스 종료 안내 */}
+        <div className="mb-6">
+          <RetirementNotice variant="help" />
+        </div>
+
         {/* 소개 */}
         <section className="text-center space-y-2 mb-6">
           <h2 className="text-2xl font-bold text-gray-800">
