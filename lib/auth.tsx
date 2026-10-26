@@ -11,6 +11,7 @@ import {
 } from "firebase/auth";
 import { auth } from "./firebase";
 import { useRouter } from "next/navigation";
+import { isNewAccountAfterBlock } from "./retirement";
 
 // Firebase가 설정되지 않은 경우를 위한 체크
 if (typeof window !== "undefined" && !auth) {
@@ -19,9 +20,15 @@ if (typeof window !== "undefined" && !auth) {
   );
 }
 
+/** closed: 새 가입이 막혀 계정을 되돌림, check-failed: 가입 여부를 확인하지 못해 로그아웃함 */
+export type SignupNotice = "closed" | "check-failed" | null;
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  signupNotice: SignupNotice;
+  showSignupNotice: (notice: Exclude<SignupNotice, null>) => void;
+  clearSignupNotice: () => void;
   signInWithGoogle: () => Promise<void>;
   signInWithNaver: () => Promise<void>;
   signInWithKakao: () => Promise<void>;
@@ -34,16 +41,57 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [signupNotice, setSignupNotice] = useState<SignupNotice>(null);
   const router = useRouter();
 
   useEffect(() => {
-    if (!auth) {
+    const authInstance = auth;
+    if (!authInstance) {
       setLoading(false);
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    // 가입 차단일 이후에 만들어진 계정인데 저장된 데이터가 없으면 "새 가입"으로 보고 되돌려요.
+    // 기존 사용자(차단일 전에 만든 계정)는 이 확인을 거치지 않아요.
+    const screenNewAccount = async (
+      candidate: User
+    ): Promise<"allowed" | "closed" | "check-failed"> => {
+      let hasData: boolean;
+      try {
+        const { hasAnyUserData } = await import("./firestore");
+        hasData = await hasAnyUserData(candidate.uid);
+      } catch (error) {
+        console.error("가입 여부 확인 실패:", error);
+        setSignupNotice("check-failed");
+        await signOut(authInstance).catch(() => undefined);
+        return "check-failed";
+      }
+      if (hasData) return "allowed";
+      setSignupNotice("closed");
+      try {
+        await deleteUser(candidate);
+      } catch (error) {
+        // 로그인한 지 오래되어 삭제가 거절되면 로그아웃만 해요. 다음 로그인 때 다시 확인해요.
+        console.warn("새 계정을 되돌리지 못해 로그아웃합니다:", error);
+        await signOut(authInstance).catch(() => undefined);
+      }
+      return "closed";
+    };
+
+    let latest = 0;
+    const unsubscribe = onAuthStateChanged(authInstance, async (nextUser) => {
+      const run = ++latest;
+      if (!nextUser || !isNewAccountAfterBlock(nextUser.metadata.creationTime)) {
+        setUser(nextUser);
+        setLoading(false);
+        return;
+      }
+      setUser(null);
+      setLoading(true);
+      const outcome = await screenNewAccount(nextUser);
+      // 확인하는 동안 로그아웃 등 더 새로운 상태 변화가 있었다면 그쪽을 따라요.
+      if (run !== latest) return;
+      setUser(outcome === "allowed" ? nextUser : null);
       setLoading(false);
     });
 
@@ -57,8 +105,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
-      router.push("/dashboard");
+      const result = await signInWithPopup(auth, provider);
+      // 새 가입 확인이 필요한 계정은 첫 화면에 머물러요(확인되면 첫 화면이 대시보드로 보내요).
+      if (!isNewAccountAfterBlock(result.user.metadata.creationTime)) {
+        router.push("/dashboard");
+      }
     } catch (error) {
       console.error("로그인 실패:", error);
       alert("로그인에 실패했습니다. Firebase 설정을 확인해주세요.");
@@ -158,6 +209,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         user,
         loading,
+        signupNotice,
+        showSignupNotice: setSignupNotice,
+        clearSignupNotice: () => setSignupNotice(null),
         signInWithGoogle,
         signInWithNaver,
         signInWithKakao,

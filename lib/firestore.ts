@@ -12,6 +12,7 @@ import {
   writeBatch,
   increment,
   updateDoc,
+  limit,
 } from "firebase/firestore";
 import type { DocumentData, Query } from "firebase/firestore";
 import { auth, db } from "./firebase";
@@ -199,6 +200,17 @@ export async function saveUserProfile(userId: string, profile: UserProfile) {
   }
   
   await setDoc(userRef, updateData, { merge: true });
+}
+
+// 이 계정에 저장된 데이터(프로필, 학급, 자리표)가 하나라도 있는지 확인 (가입 차단 판단용)
+export async function hasAnyUserData(userId: string): Promise<boolean> {
+  if (!db) throw new Error("Firestore가 초기화되지 않았습니다.");
+  const [profileSnap, rostersSnap, layoutsSnap] = await Promise.all([
+    getDoc(doc(db, "users", userId)),
+    getDocs(query(collection(db, `users/${userId}/classRosters`), limit(1))),
+    getDocs(query(collection(db, `users/${userId}/layouts`), limit(1))),
+  ]);
+  return profileSnap.exists() || !rostersSnap.empty || !layoutsSnap.empty;
 }
 
 // 사용자 계정 삭제 (모든 데이터 삭제)
