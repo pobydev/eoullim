@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import admin from "@/lib/firebase-admin";
+import {
+  SIGNUP_CLOSED_CODE,
+  SIGNUP_CLOSED_MESSAGE,
+  isBlockedNewSignup,
+} from "@/lib/signup-guard";
 
 export async function POST(request: NextRequest) {
   try {
@@ -57,6 +62,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Firebase Admin이 초기화되지 않았습니다." },
         { status: 500 }
+      );
+    }
+
+    // 새 가입 차단: Firebase에 아직 없는 계정이면 토큰을 만들지 않아요(기존 사용자는 그대로).
+    if (await isBlockedNewSignup(uid)) {
+      return NextResponse.json(
+        { error: SIGNUP_CLOSED_MESSAGE, code: SIGNUP_CLOSED_CODE },
+        { status: 403 }
       );
     }
 

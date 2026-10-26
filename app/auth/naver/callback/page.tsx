@@ -4,11 +4,14 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signInWithCustomToken } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { useAuth } from "@/lib/auth";
+import { SIGNUP_CLOSED_CODE, isNewAccountAfterBlock } from "@/lib/retirement";
 
 function NaverCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
+  const { showSignupNotice } = useAuth();
 
   const getErrorMessage = (error: unknown): string => {
     if (error instanceof Error) {
@@ -45,17 +48,29 @@ function NaverCallbackContent() {
 
         const data = await response.json();
 
+        if (response.status === 403 && data.code === SIGNUP_CLOSED_CODE) {
+          // 새 가입이 막힌 경우: 첫 화면에서 안내 창을 보여줘요.
+          showSignupNotice("closed");
+          router.replace("/");
+          return;
+        }
+
         if (!response.ok) {
           throw new Error(data.error || "로그인 처리 실패");
         }
 
         if (data.customToken && auth) {
           // Firebase Custom Token으로 로그인
-          await signInWithCustomToken(auth, data.customToken);
+          const credential = await signInWithCustomToken(auth, data.customToken);
           if (typeof window !== "undefined") {
             sessionStorage.removeItem('naver_oauth_state');
           }
-          router.push("/dashboard");
+          // 새 가입 확인이 필요한 계정은 첫 화면에서 확인을 마친 뒤 대시보드로 가요.
+          router.push(
+            isNewAccountAfterBlock(credential.user.metadata.creationTime)
+              ? "/"
+              : "/dashboard"
+          );
         } else {
           throw new Error("토큰을 받지 못했습니다.");
         }
@@ -67,7 +82,7 @@ function NaverCallbackContent() {
     };
 
     handleCallback();
-  }, [searchParams, router]);
+  }, [searchParams, router, showSignupNotice]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-sky-200 via-sky-50 to-blue-200">
