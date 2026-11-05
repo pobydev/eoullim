@@ -12,9 +12,9 @@ export const SERVICE_END_DATE = "2027-02-26";
 /** 웹에 저장된 데이터를 지우는 날. */
 export const DATA_DELETION_DATE = "2027-03-05";
 
-/** PC판 내려받기 주소(임시). 실제 배포 주소가 정해지면 여기만 바꿔 주세요. */
-export const PC_DOWNLOAD_URL =
-  "https://github.com/pobydev/eoullim-pc/releases/latest";
+/** PC판 내려받기 단추가 여는 곳: gnilab 홈페이지의 어울림 소개 페이지.
+ *  설치판·USB판 내려받기와 웹판에서 옮겨 오는 방법이 함께 있어요(2026-11-05). */
+export const PC_DOWNLOAD_URL = "https://gnilab.vercel.app/apps/eoullim";
 
 /** 카카오·네이버 로그인 API가 새 가입을 거절할 때 돌려주는 코드 */
 export const SIGNUP_CLOSED_CODE = "signup-closed";
